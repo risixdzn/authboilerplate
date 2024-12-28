@@ -32,6 +32,22 @@ server.register(fastifySwagger, {
             summary: "test",
             description: "test2",
         },
+        tags: [
+            {
+                name: "Auth",
+                description: "Routes used for authentication (register, login and confirmations)",
+            },
+        ],
+        security: [],
+        components: {
+            securitySchemes: {
+                JWT: {
+                    type: "http",
+                    scheme: "bearer",
+                    bearerFormat: "Bearer",
+                },
+            },
+        },
     },
     transform: jsonSchemaTransform,
 });
@@ -40,6 +56,7 @@ server.register(fastifySwagger, {
 server.register(fastifySwaggerUi, {
     routePrefix: "/docs",
 });
+
 server.register(scalarUi, {
     routePrefix: "/reference",
     configuration: {
@@ -47,12 +64,20 @@ server.register(scalarUi, {
         spec: {
             url: "/docs/json",
         },
+        metaData: {
+            title: "Docs - Auth Boilerplate API",
+        },
+        theme: "none",
     },
 });
 
 //Register routes and plugins.
 server.register(fastifyJwt, {
     secret: env.JWT_SECRET,
+    cookie: {
+        cookieName: "token",
+        signed: false,
+    },
 });
 
 server.register(fastifyCookie, {

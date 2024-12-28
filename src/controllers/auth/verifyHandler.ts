@@ -1,5 +1,7 @@
 import { FastifyReply } from 'fastify';
 
+import { apiResponse } from '@/src/helpers/response';
+
 import { setUserVerified } from '../../services/auth.services';
 import { deleteOneTimeToken, queryOneTimeToken } from '../../services/tokens.services';
 
@@ -14,33 +16,50 @@ export async function verifyHandler({
 
     //Checks if the token exists, if it's not expired and if it's a confirmation token
     if (!oneTimeToken) {
-        return response.status(404).send({
-            statusCode: 404,
-            error: "Not Found",
-            message: "Token not found",
-        });
+        return response.status(404).send(
+            apiResponse({
+                status: 404,
+                error: "Not Found",
+                code: "token_not_found",
+                message: "Token not found",
+                data: null,
+            })
+        );
     }
     if (oneTimeToken.expiresAt < new Date()) {
-        return response.status(401).send({
-            statusCode: 401,
-            error: "Unauthorized",
-            message: "Token expired",
-        });
+        return response.status(401).send(
+            apiResponse({
+                status: 410,
+                error: "Gone",
+                code: "token_expired",
+                message: "Token expired",
+                data: null,
+            })
+        );
     }
     if (oneTimeToken.tokenType !== "confirmation") {
-        return response.status(400).send({
-            statusCode: 400,
-            error: "Bad Request",
-            message: "Invalid token",
-        });
+        return response.status(400).send(
+            apiResponse({
+                status: 400,
+                error: "Bad Request",
+                code: "invalid_token",
+                message: "Invalid token",
+                data: null,
+            })
+        );
     }
 
     //If all checks succeed, update the user to be verified and delete the token
     await setUserVerified(oneTimeToken.user.id);
     await deleteOneTimeToken(oneTimeToken.token);
 
-    return response.status(200).send({
-        statusCode: 200,
-        message: "Email verified successfully",
-    });
+    return response.status(200).send(
+        apiResponse({
+            status: 200,
+            error: null,
+            code: "email_verify_success",
+            message: "Email verified successfully",
+            data: null,
+        })
+    );
 }

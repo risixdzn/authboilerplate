@@ -23,7 +23,7 @@ export async function authRoutes(fastify: FastifyTypedInstance) {
         }
     );
 
-    fastify.post("/login", async (request, response) => {
+    fastify.post("/login", { schema: authDocs.loginSchema }, async (request, response) => {
         const body = await loginUserSchema.parseAsync(request.body);
 
         await loginHandler({ body, response });
@@ -31,6 +31,7 @@ export async function authRoutes(fastify: FastifyTypedInstance) {
 
     fastify.get(
         "/verify",
+        { schema: authDocs.verifySchema },
         async (request: FastifyRequest<{ Querystring: { token: string } }>, response) => {
             const query = await verifyEmailSchema.parseAsync(request.query);
 
@@ -39,7 +40,7 @@ export async function authRoutes(fastify: FastifyTypedInstance) {
         }
     );
 
-    fastify.post("/token", async (request, response) => {
+    fastify.post("/token", { schema: authDocs.revalidateSchema }, async (request, response) => {
         const refreshToken = request.cookies["refreshToken"];
 
         await revalidateHandler({ refreshToken, response });

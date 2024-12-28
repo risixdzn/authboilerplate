@@ -1,5 +1,7 @@
 import { FastifyReply } from 'fastify';
 
+import { apiResponse } from '@/src/helpers/response';
+
 import { signJWT } from '../../helpers/jwt';
 import { generateRefreshToken } from '../../helpers/tokens';
 import { queryTokenData } from '../../services/auth.services';
@@ -20,39 +22,55 @@ export async function revalidateHandler({
     response: FastifyReply;
 }) {
     if (!refreshToken) {
-        return response.status(401).send({
-            statusCode: 401,
-            error: "Unauthorized",
-            message: "No refresh token provided",
-        });
+        return response.status(400).send(
+            apiResponse({
+                status: 400,
+                error: "Bad Request",
+                code: "no_refresh_provided",
+                message: "No refresh token provided",
+                data: null,
+            })
+        );
     }
 
     const tokenData = await queryTokenData(refreshToken);
 
     if (!tokenData) {
-        return response.status(401).send({
-            statusCode: 401,
-            error: "Unauthorized",
-            message: "Invalid refresh token",
-        });
+        return response.status(401).send(
+            apiResponse({
+                status: 401,
+                error: "Unauthorized",
+                code: "invalid_refresh",
+                message: "Invalid refresh token",
+                data: null,
+            })
+        );
     }
 
     if (tokenData.expiresAt < new Date()) {
-        return response.status(401).send({
-            statusCode: 401,
-            error: "Unauthorized",
-            message: "Refresh token expired",
-        });
+        return response.status(410).send(
+            apiResponse({
+                status: 410,
+                error: "Gone",
+                code: "refresh_expired",
+                message: "Refresh token expired",
+                data: null,
+            })
+        );
     }
 
     const user = tokenData.user;
 
     if (!user) {
-        return response.status(401).send({
-            statusCode: 401,
-            error: "Unauthorized",
-            message: "User not found",
-        });
+        return response.status(404).send(
+            apiResponse({
+                status: 404,
+                error: "Not found",
+                code: "user_not_found",
+                message: "User not found",
+                data: null,
+            })
+        );
     }
 
     const jwt = signJWT({
@@ -66,5 +84,16 @@ export async function revalidateHandler({
 
     const newRefreshToken = generateRefreshToken();
     await setRefreshToken(response, newRefreshToken, user.id);
-    return response.status(200).send({ token: jwt });
+
+    return response.status(200).send(
+        apiResponse({
+            status: 200,
+            error: null,
+            code: "revalidate_success",
+            message: "JWT revalidated successfully",
+            data: {
+                token: jwt,
+            },
+        })
+    );
 }

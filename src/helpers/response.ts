@@ -1,9 +1,9 @@
-export type ApiResponse<T = null> = {
+export type ApiResponse = {
     status: number;
     error: string | null;
     message: string;
     code: string;
-    data: T | null;
+    data: unknown | null;
 };
 
 export const apiResponse = ({ status, error, message, code, data }: ApiResponse) => {
