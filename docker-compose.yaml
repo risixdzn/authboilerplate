@@ -1,0 +1,32 @@
+services:
+    postgres:
+        image: postgres:latest
+        restart: unless-stopped
+        env_file: .env
+        environment:
+            - POSTGRES_USER=$POSTGRES_USER
+            - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+            - POSTGRES_DATABASE=$POSTGRES_DATABASE
+        ports:
+            - $POSTGRES_PORT:$POSTGRES_PORT
+        volumes:
+            - db:/var/lib/postgres
+    app:
+        depends_on:
+            - postgres
+        build: .
+        restart: unless-stopped
+        env_file: .env
+        ports:
+            - $NODE_PORT:$NODE_PORT
+        environment:
+            - DATABASE_URL=$DATABASE_URL
+            - JWT_SECRET=$JWT_SECRET
+            - REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET
+            - COOKIE_ENCRYPTION_SECRET=$COOKIE_ENCRYPTION_SECRET
+            - RESEND_KEY=$RESEND_KEY
+        stdin_open: true
+        tty: true
+
+volumes: 
+    db:
