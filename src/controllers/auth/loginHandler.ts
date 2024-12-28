@@ -17,14 +17,15 @@ export async function loginHandler({
     body: z.infer<typeof loginUserSchema>;
     response: FastifyReply;
 }) {
+    const email = body.email.toLowerCase();
     //First check if the user exists
-    const user = await queryUserByEmail(body.email);
+    const user = await queryUserByEmail(email);
 
     if (!user) {
         return response.status(404).send(
             apiResponse({
-                status: 400,
-                error: "Bad Request",
+                status: 404,
+                error: "Not Found",
                 code: "user_not_found",
                 message: "User not found",
                 data: null,

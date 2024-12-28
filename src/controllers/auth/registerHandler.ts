@@ -1,13 +1,13 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
-import { z } from 'zod';
+import { FastifyReply, FastifyRequest } from "fastify";
+import { z } from "zod";
 
-import { apiResponse } from '@/src/helpers/response';
+import { apiResponse } from "@/src/helpers/response";
 
-import { hashPassword } from '../../helpers/hash-password';
-import { emailDisplayName, sendAccountVerificationEmail } from '../../helpers/mailing';
-import { createUserSchema } from '../../interfaces/auth';
-import { createUser, deleteUser, queryUserByEmail } from '../../services/auth.services';
-import { createOneTimeToken } from '../../services/tokens.services';
+import { hashPassword } from "../../helpers/hash-password";
+import { emailDisplayName, sendAccountVerificationEmail } from "../../helpers/mailing";
+import { createUserSchema } from "../../interfaces/auth";
+import { createUser, deleteUser, queryUserByEmail } from "../../services/auth.services";
+import { createOneTimeToken } from "../../services/tokens.services";
 
 export async function registerHandler({
     body,
@@ -18,14 +18,15 @@ export async function registerHandler({
     request: FastifyRequest;
     response: FastifyReply;
 }) {
-    const existingEmail = await queryUserByEmail(body.email);
+    const email = body.email.toLowerCase();
+    const existingEmail = await queryUserByEmail(email);
 
     //First, check if the email is already taken
     if (existingEmail) {
         return response.status(409).send(
             apiResponse({
                 status: 409,
-                error: "Bad Request",
+                error: "Conflict",
                 code: "email_already_used",
                 message: "Email is already registered.",
                 data: null,
@@ -38,7 +39,7 @@ export async function registerHandler({
 
     const newUser = await createUser({
         displayName: body.displayName,
-        email: body.email,
+        email: email,
         passwordHash: hashedPassword,
     });
 
@@ -49,13 +50,13 @@ export async function registerHandler({
     });
     const verificationUrl = `${request.protocol}://${request.hostname}/auth/verify?token=${oneTimeToken.token}`;
 
-    const email = await sendAccountVerificationEmail({
+    const verificationEmail = await sendAccountVerificationEmail({
         to: newUser.email,
         verificationUrl: verificationUrl,
         displayName: newUser.displayName ?? emailDisplayName(newUser.email),
     });
 
-    if (!email) {
+    if (!verificationEmail) {
         await deleteUser(newUser.id);
 
         return response.status(500).send(

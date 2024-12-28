@@ -1,8 +1,8 @@
-import { FastifySchema } from 'fastify';
-import { z } from 'zod';
+import { FastifySchema } from "fastify";
+import { z } from "zod";
 
-import { createUserSchema, loginUserSchema } from '../interfaces/auth';
-import { zodResponseSchema } from './types';
+import { createUserSchema, loginUserSchema } from "../interfaces/auth";
+import { zodResponseSchema } from "./types";
 
 const registerSchema: FastifySchema = {
     tags: ["Auth"],
@@ -16,7 +16,7 @@ For this, we generate a \`oneTimeToken\`, save it on the database, and send it t
     response: {
         409: zodResponseSchema({
             status: 409,
-            error: "Bad Request",
+            error: "Conflict",
             code: "email_already_used",
             message: "Email is already registered.",
             data: null,
@@ -46,8 +46,8 @@ const loginSchema: FastifySchema = {
     body: loginUserSchema,
     response: {
         404: zodResponseSchema({
-            status: 400,
-            error: "Bad Request",
+            status: 404,
+            error: "Not Found",
             code: "user_not_found",
             message: "User not found",
             data: null,
@@ -108,7 +108,7 @@ This should be used when the short lived \`JWT\` expires.
             code: "refresh_expired",
             message: "Refresh token expired",
             data: null,
-        }).describe("Invalid refreshToken."),
+        }).describe("The refreshToken expired."),
         404: zodResponseSchema({
             status: 404,
             error: "Not found",
@@ -146,7 +146,7 @@ When the confirmation email is sent, a link to this API route is sent together w
             message: "Token not found",
             data: null,
         }).describe("Provided token was not found."),
-        401: zodResponseSchema({
+        410: zodResponseSchema({
             status: 410,
             error: "Gone",
             code: "token_expired",

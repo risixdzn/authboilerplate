@@ -1,9 +1,9 @@
-import { FastifyReply } from 'fastify';
+import { FastifyReply } from "fastify";
 
-import { apiResponse } from '@/src/helpers/response';
+import { apiResponse } from "@/src/helpers/response";
 
-import { setUserVerified } from '../../services/auth.services';
-import { deleteOneTimeToken, queryOneTimeToken } from '../../services/tokens.services';
+import { setUserVerified } from "../../services/auth.services";
+import { deleteOneTimeToken, queryOneTimeToken } from "../../services/tokens.services";
 
 export async function verifyHandler({
     token,
@@ -27,7 +27,7 @@ export async function verifyHandler({
         );
     }
     if (oneTimeToken.expiresAt < new Date()) {
-        return response.status(401).send(
+        return response.status(410).send(
             apiResponse({
                 status: 410,
                 error: "Gone",

@@ -1,11 +1,11 @@
-import { FastifyReply } from 'fastify';
+import { FastifyReply } from "fastify";
 
-import { apiResponse } from '@/src/helpers/response';
+import { apiResponse } from "@/src/helpers/response";
 
-import { signJWT } from '../../helpers/jwt';
-import { generateRefreshToken } from '../../helpers/tokens';
-import { queryTokenData } from '../../services/auth.services';
-import { setRefreshToken } from '../../services/tokens.services';
+import { signJWT } from "../../helpers/jwt";
+import { generateRefreshToken } from "../../helpers/tokens";
+import { queryTokenData } from "../../services/auth.services";
+import { setRefreshToken } from "../../services/tokens.services";
 
 /*
 This function is used to revalidate the JWT token
