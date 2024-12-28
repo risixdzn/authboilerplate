@@ -1,14 +1,14 @@
-import bcrypt from 'bcryptjs';
-import { FastifyReply } from 'fastify';
-import { z } from 'zod';
+import bcrypt from "bcryptjs";
+import { FastifyReply } from "fastify";
+import { z } from "zod";
 
-import { apiResponse } from '@/src/helpers/response';
+import { apiResponse } from "@/src/helpers/response";
 
-import { signJWT } from '../../helpers/jwt';
-import { generateRefreshToken } from '../../helpers/tokens';
-import { loginUserSchema } from '../../interfaces/auth';
-import { queryUserByEmail } from '../../services/auth.services';
-import { setRefreshToken } from '../../services/tokens.services';
+import { signJWT } from "../../helpers/jwt";
+import { generateRefreshToken } from "../../helpers/tokens";
+import { loginUserSchema } from "../../interfaces/auth";
+import { queryUserByEmail } from "../../services/auth.services";
+import { setRefreshToken } from "../../services/tokens.services";
 
 export async function loginHandler({
     body,
@@ -33,7 +33,7 @@ export async function loginHandler({
     }
 
     if (user.verified === false) {
-        return response.status(401).send(
+        return response.status(403).send(
             apiResponse({
                 status: 403,
                 error: "Forbidden",

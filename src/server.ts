@@ -1,21 +1,24 @@
-import chalk from 'chalk';
-import { fastify } from 'fastify';
+import chalk from "chalk";
+import { fastify } from "fastify";
 import {
-    jsonSchemaTransform, serializerCompiler, validatorCompiler, ZodTypeProvider
-} from 'fastify-type-provider-zod';
-import { ZodError } from 'zod';
+    jsonSchemaTransform,
+    serializerCompiler,
+    validatorCompiler,
+    ZodTypeProvider,
+} from "fastify-type-provider-zod";
+import { ZodError } from "zod";
 
-import { fastifyCookie } from '@fastify/cookie';
-import fastifyCors from '@fastify/cors';
-import { fastifyJwt } from '@fastify/jwt';
-import fastifySwagger from '@fastify/swagger';
-import fastifySwaggerUi from '@fastify/swagger-ui';
-import scalarUi from '@scalar/fastify-api-reference';
+import { fastifyCookie } from "@fastify/cookie";
+import fastifyCors from "@fastify/cors";
+import { fastifyJwt } from "@fastify/jwt";
+import fastifySwagger from "@fastify/swagger";
+import fastifySwaggerUi from "@fastify/swagger-ui";
+import scalarUi from "@scalar/fastify-api-reference";
 
-import { env } from './env';
-import { accountRoutes } from './routes/account.routes';
-import { authRoutes } from './routes/auth.routes';
-import { credentialsRoutes } from './routes/credentials.routes';
+import { env } from "./env";
+import { accountRoutes } from "./routes/account.routes";
+import { authRoutes } from "./routes/auth.routes";
+import { credentialsRoutes } from "./routes/credentials.routes";
 
 //Set Zod as the default request/response data serializer
 const server = fastify().withTypeProvider<ZodTypeProvider>();

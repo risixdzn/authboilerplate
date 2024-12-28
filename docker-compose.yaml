@@ -25,8 +25,11 @@ services:
             - REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET
             - COOKIE_ENCRYPTION_SECRET=$COOKIE_ENCRYPTION_SECRET
             - RESEND_KEY=$RESEND_KEY
+            - CHOKIDAR_USEPOLLING=true # Need to add this so the underlying engine on tsx could pick up file changes and hot reload
         stdin_open: true
         tty: true
-
+        volumes:
+            - .:/app
+            - /app/node_modules
 volumes: 
     db:
