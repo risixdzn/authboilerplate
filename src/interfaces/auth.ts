@@ -1,7 +1,7 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export interface createUser {
-    displayName: string;
+    displayName?: string | null;
     email: string;
     password: string;
 }
@@ -16,7 +16,7 @@ export const createUserSchema = z.object({
             message:
                 "Password needs to contain one uppercase character, one lowercase character, one number, one special character and be at least 8 length.",
         }),
-    displayName: z.string().min(3).max(100),
+    displayName: z.string().min(3).max(100).optional(),
 });
 
 export interface loginUser {

@@ -1,11 +1,14 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyReply, FastifyRequest } from "fastify";
 
-import { emailDisplayName, sendAccountDeletionEmail } from '../../helpers/mailing';
-import { queryUserById } from '../../services/account.services';
-import { deleteUser } from '../../services/auth.services';
+import { emailDisplayName, sendAccountDeletionEmail } from "../../helpers/mailing";
+import { queryUserById } from "../../services/account.services";
+import { deleteUser } from "../../services/auth.services";
 import {
-    createOneTimeToken, getUserOneTimeTokens, queryOneTimeToken
-} from '../../services/tokens.services';
+    createOneTimeToken,
+    getUserOneTimeTokens,
+    queryOneTimeToken,
+} from "../../services/tokens.services";
+import { apiResponse } from "@/src/helpers/response";
 
 export async function requestAccountDeletionHandler({
     userId,
@@ -20,23 +23,31 @@ export async function requestAccountDeletionHandler({
 
     for (const token of oneTimeTokens) {
         if (token.tokenType === "account_deletion") {
-            return response.status(409).send({
-                statusCode: 409,
-                error: "Bad Request",
-                message:
-                    "Deletion request already exists. Finish it or wait until expiration to request a new one.",
-            });
+            return response.status(409).send(
+                apiResponse({
+                    status: 409,
+                    error: "Conflict",
+                    code: "existing_deletion_request",
+                    message:
+                        "Deletion request already exists. Finish it or wait until expiration to request a new one.",
+                    data: null,
+                })
+            );
         }
     }
 
     const user = await queryUserById(userId);
 
     if (!user) {
-        return response.status(404).send({
-            statusCode: 404,
-            error: "Not Found",
-            message: "User not found",
-        });
+        return response.status(404).send(
+            apiResponse({
+                status: 404,
+                error: "Not Found",
+                code: "user_not_found",
+                message: "User not found",
+                data: null,
+            })
+        );
     }
 
     const oneTimeToken = await createOneTimeToken({
@@ -53,11 +64,15 @@ export async function requestAccountDeletionHandler({
         displayName: user.displayName ?? emailDisplayName(user.email),
     });
 
-    return response.status(201).send({
-        statusCode: 201,
-        error: null,
-        message: "Deletion request accepted",
-    });
+    return response.status(201).send(
+        apiResponse({
+            status: 201,
+            error: null,
+            code: "deletion_request_accepted",
+            message: "Deletion request accepted, confirm email.",
+            data: null,
+        })
+    );
 }
 
 export async function confirmAccountDeletionHandler({
@@ -71,32 +86,49 @@ export async function confirmAccountDeletionHandler({
 
     //Checks if the token exists, if it's not expired and if it's a deletion token
     if (!oneTimeToken) {
-        return response.status(404).send({
-            statusCode: 404,
-            error: "Not Found",
-            message: "Token not found",
-        });
+        return response.status(404).send(
+            apiResponse({
+                status: 404,
+                error: "Not Found",
+                code: "token_not_found",
+                message: "Token not found",
+                data: null,
+            })
+        );
     }
     if (oneTimeToken.expiresAt < new Date()) {
-        return response.status(401).send({
-            statusCode: 401,
-            error: "Unauthorized",
-            message: "Token expired",
-        });
+        return response.status(410).send(
+            apiResponse({
+                status: 410,
+                error: "Gone",
+                code: "token_expired",
+                message: "Token expired",
+                data: null,
+            })
+        );
     }
     if (oneTimeToken.tokenType !== "account_deletion") {
-        return response.status(400).send({
-            statusCode: 400,
-            error: "Bad Request",
-            message: "Invalid token",
-        });
+        return response.status(400).send(
+            apiResponse({
+                status: 400,
+                error: "Bad Request",
+                code: "invalid_token",
+                message: "Invalid token",
+                data: null,
+            })
+        );
     }
 
     //If all checks succeed, delete the user and the token will be automatically cascade deleted
     await deleteUser(oneTimeToken.user.id);
 
-    return response.status(200).send({
-        statusCode: 200,
-        message: "User deleted sucessfully",
-    });
+    return response.status(200).send(
+        apiResponse({
+            status: 200,
+            error: null,
+            code: "account_deletion_success",
+            message: "Account deleted sucessfully",
+            data: null,
+        })
+    );
 }

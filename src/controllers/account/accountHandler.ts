@@ -1,10 +1,12 @@
-import { FastifyReply } from 'fastify';
-import { z } from 'zod';
+import { FastifyReply } from "fastify";
+import { z } from "zod";
 
-import { editAccountSchema } from '../../interfaces/account';
-import { queryUserById, updateUserById } from '../../services/account.services';
+import { editAccountSchema } from "../../interfaces/account";
+import { queryUserById, updateUserById } from "../../services/account.services";
 
 import type { UserJWT } from "../../../fastify";
+import { apiResponse } from "@/src/helpers/response";
+
 export async function getAccountHandler({
     userId,
     response,
@@ -15,23 +17,31 @@ export async function getAccountHandler({
     const user = await queryUserById(userId);
 
     if (!user) {
-        return response.status(404).send({
-            statusCode: 404,
-            error: "Not Found",
-            message: "User not found",
-        });
+        return response.status(404).send(
+            apiResponse({
+                status: 404,
+                error: "Not Found",
+                code: "user_not_found",
+                message: "User not found",
+                data: null,
+            })
+        );
     }
 
-    return response.status(200).send({
-        statusCode: 200,
-        error: null,
-        data: {
-            id: user.id,
-            display_name: user.displayName,
-            email: user.email,
-            createdAt: user.createdAt,
-        },
-    });
+    return response.status(200).send(
+        apiResponse({
+            status: 200,
+            error: null,
+            code: "get_account_success",
+            message: "Account retrieved successfully.",
+            data: {
+                id: user.id,
+                displayName: user.displayName,
+                email: user.email,
+                createdAt: user.createdAt,
+            },
+        })
+    );
 }
 
 export async function editAccountHandler({
@@ -45,9 +55,25 @@ export async function editAccountHandler({
 }) {
     const updatedUser = await updateUserById(body, user.id);
 
-    return response.status(200).send({
-        statusCode: 200,
-        error: null,
-        data: updatedUser,
-    });
+    if (!updatedUser) {
+        return response.status(404).send(
+            apiResponse({
+                status: 404,
+                error: "Not Found",
+                code: "user_not_found",
+                message: "User not found",
+                data: null,
+            })
+        );
+    }
+
+    return response.status(200).send(
+        apiResponse({
+            status: 200,
+            error: null,
+            code: "update_account_success",
+            message: "Account data updated successfully",
+            data: updatedUser,
+        })
+    );
 }

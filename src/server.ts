@@ -40,6 +40,10 @@ server.register(fastifySwagger, {
                 name: "Auth",
                 description: "Routes used for authentication (register, login and confirmations)",
             },
+            {
+                name: "Account",
+                description: "Edit account data or delete it through these routes.",
+            },
         ],
         security: [],
         components: {
@@ -97,6 +101,10 @@ server.register(accountRoutes, {
 
 server.register(credentialsRoutes, {
     prefix: "/credentials",
+});
+
+server.get("/", (_, reply) => {
+    reply.status(200).send("OK");
 });
 
 server.register(fastifyCors, { origin: "*" });
