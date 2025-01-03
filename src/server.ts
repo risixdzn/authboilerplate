@@ -9,6 +9,7 @@ import {
 import { ZodError } from "zod";
 
 import { fastifyCookie } from "@fastify/cookie";
+import { fastifyStatic } from "@fastify/static";
 import fastifyCors from "@fastify/cors";
 import { fastifyJwt } from "@fastify/jwt";
 import fastifySwagger from "@fastify/swagger";
@@ -19,6 +20,10 @@ import { env } from "./env";
 import { accountRoutes } from "./routes/account.routes";
 import { authRoutes } from "./routes/auth.routes";
 import { credentialsRoutes } from "./routes/credentials.routes";
+import { apiDescription } from "./docs/main";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+import { cwd } from "process";
 
 //Set Zod as the default request/response data serializer
 const server = fastify().withTypeProvider<ZodTypeProvider>();
@@ -32,8 +37,8 @@ server.register(fastifySwagger, {
         info: {
             title: "Auth Boilerplate API",
             version: "1.0.0",
-            summary: "test",
-            description: "test2",
+            summary: "Auth Boilerplate API",
+            description: apiDescription,
         },
         tags: [
             {
@@ -59,23 +64,24 @@ server.register(fastifySwagger, {
     transform: jsonSchemaTransform,
 });
 
-//Set SwaggerUi as the frontend for the docs
-server.register(fastifySwaggerUi, {
-    routePrefix: "/docs",
-});
-
+//Set Scalar as the frontend for the docs
 server.register(scalarUi, {
-    routePrefix: "/reference",
+    routePrefix: "/docs",
     configuration: {
         title: "Our API Reference",
         spec: {
-            url: "/docs/json",
+            url: "/reference/json",
         },
         metaData: {
             title: "Docs - Auth Boilerplate API",
         },
         theme: "none",
     },
+});
+
+//Also register Swagger for the classic API reference
+server.register(fastifySwaggerUi, {
+    routePrefix: "/reference",
 });
 
 //Register routes and plugins.
@@ -89,6 +95,11 @@ server.register(fastifyJwt, {
 
 server.register(fastifyCookie, {
     secret: env.COOKIE_ENCRYPTION_SECRET,
+});
+
+server.register(fastifyStatic, {
+    root: join(cwd(), "src", "public"),
+    prefix: "/public/",
 });
 
 server.register(authRoutes, {
@@ -130,7 +141,7 @@ server
         host: "0.0.0.0",
     })
     .then(() => {
-        console.log(chalk.greenBright("Server running!"));
+        console.log(chalk.greenBright(`✔ Server running at http://localhost:${env.NODE_PORT}`));
     });
 
 export default server;

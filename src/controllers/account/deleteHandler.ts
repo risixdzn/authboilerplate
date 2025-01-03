@@ -56,7 +56,7 @@ export async function requestAccountDeletionHandler({
         tokenType: "account_deletion",
     });
 
-    const verificationUrl = `${request.protocol}://${request.hostname}/account/confirm-deletion?token=${oneTimeToken.token}`;
+    const verificationUrl = `${request.protocol}://${request.host}/account/confirm-deletion?token=${oneTimeToken.token}`;
 
     await sendAccountDeletionEmail({
         to: user.email,

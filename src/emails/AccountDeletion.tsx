@@ -1,15 +1,26 @@
-import * as React from 'react';
+import * as React from "react";
 
 import {
-    Body, Button, Container, Head, Html, Img, Link, Preview, render, Section, Text
-} from '@react-email/components';
+    Body,
+    Button,
+    Container,
+    Head,
+    Html,
+    Img,
+    Link,
+    Preview,
+    render,
+    Section,
+    Text,
+} from "@react-email/components";
 
 interface EmailProps {
     displayName: string;
+    appName: string;
     verificationUrl: string;
 }
 
-export const AccountDeletionEmail = ({ displayName, verificationUrl }: EmailProps) => (
+export const AccountDeletionEmail = ({ displayName, appName, verificationUrl }: EmailProps) => (
     <Html>
         <Head />
         <Preview>{displayName}, confirm your account deletion.</Preview>
@@ -24,7 +35,7 @@ export const AccountDeletionEmail = ({ displayName, verificationUrl }: EmailProp
                         Hey <strong>{displayName}</strong>.
                     </Text>
                     <Text style={text}>
-                        You requested account deletion on (<Link>[appname]</Link>). By clicking the
+                        You requested account deletion on (<Link>{appName}</Link>). By clicking the
                         button below, your account will be <strong>permanently deleted</strong> with
                         all associated data.
                     </Text>
@@ -106,11 +117,17 @@ const footer = {
 export function renderEmail({
     verificationUrl,
     displayName,
+    appName,
 }: {
     verificationUrl: string;
     displayName: string;
+    appName: string;
 }): string {
     return render(
-        <AccountDeletionEmail verificationUrl={verificationUrl} displayName={displayName} />
+        <AccountDeletionEmail
+            verificationUrl={verificationUrl}
+            displayName={displayName}
+            appName={appName}
+        />
     );
 }

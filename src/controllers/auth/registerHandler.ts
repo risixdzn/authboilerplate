@@ -48,7 +48,8 @@ export async function registerHandler({
         userId: newUser.id,
         tokenType: "confirmation",
     });
-    const verificationUrl = `${request.protocol}://${request.hostname}/auth/verify?token=${oneTimeToken.token}`;
+
+    const verificationUrl = `${request.protocol}://${request.host}/auth/verify?token=${oneTimeToken.token}`;
 
     const verificationEmail = await sendAccountVerificationEmail({
         to: newUser.email,

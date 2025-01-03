@@ -1,17 +1,28 @@
-import * as React from 'react';
+import * as React from "react";
 
 import {
-    Body, Button, Container, Head, Html, Img, Link, Preview, render, Section, Text
-} from '@react-email/components';
+    Body,
+    Button,
+    Container,
+    Head,
+    Html,
+    Img,
+    Link,
+    Preview,
+    render,
+    Section,
+    Text,
+} from "@react-email/components";
 
 interface EmailProps {
     displayName: string;
+    appName: string;
     verificationUrl: string;
 }
 
 const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "";
 
-export const VerificationEmail = ({ displayName, verificationUrl }: EmailProps) => (
+export const VerificationEmail = ({ displayName, appName, verificationUrl }: EmailProps) => (
     <Html>
         <Head />
         <Preview>{displayName}, Confirm your email!</Preview>
@@ -28,7 +39,7 @@ export const VerificationEmail = ({ displayName, verificationUrl }: EmailProps) 
                         Hey <strong>{displayName}</strong>!
                     </Text>
                     <Text style={text}>
-                        You have registered a new account on (<Link>[appname]</Link>), click the
+                        You have registered a new account on <Link>{appName}</Link>, click the
                         button below to confirm your identity.
                     </Text>
 
@@ -107,11 +118,17 @@ const footer = {
 export function renderEmail({
     verificationUrl,
     displayName,
+    appName,
 }: {
     verificationUrl: string;
     displayName: string;
+    appName: string;
 }): string {
     return render(
-        <VerificationEmail verificationUrl={verificationUrl} displayName={displayName} />
+        <VerificationEmail
+            verificationUrl={verificationUrl}
+            displayName={displayName}
+            appName={appName}
+        />
     );
 }
