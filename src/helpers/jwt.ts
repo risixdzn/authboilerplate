@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { nonSensitiveUser } from "../interfaces/auth";
 import server from "../server";
 
@@ -5,7 +6,7 @@ export function signJWT({
     payload,
     expiresIn,
 }: {
-    payload: nonSensitiveUser;
+    payload: z.infer<typeof nonSensitiveUser>;
     expiresIn?: string | number;
 }): string {
     return server.jwt.sign(payload, { expiresIn: expiresIn ?? "300s" });

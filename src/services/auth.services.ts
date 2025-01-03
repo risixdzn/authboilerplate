@@ -1,8 +1,9 @@
-import { eq } from 'drizzle-orm';
+import { eq } from "drizzle-orm";
 
-import { db } from '../db/connection';
-import { refreshTokens, users } from '../db/schema';
-import { createUser } from '../interfaces/auth';
+import { db } from "../db/connection";
+import { refreshTokens, users } from "../db/schema";
+import { createUserSchema } from "../interfaces/auth";
+import { z } from "zod";
 
 export async function queryUserByEmail(email: string) {
     const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
@@ -31,16 +32,15 @@ export async function queryTokenData(token: string) {
     return data;
 }
 
-export async function createUser(user: Omit<createUser, "password"> & { passwordHash: string }) {
-    const [newUser] = await db
-        .insert(users)
-        .values(user)
-        .returning({
-            id: users.id,
-            email: users.email,
-            displayName: users.displayName,
-            createdAt: users.createdAt,
-        });
+export async function createUser(
+    user: Omit<z.infer<typeof createUserSchema>, "password"> & { passwordHash: string }
+) {
+    const [newUser] = await db.insert(users).values(user).returning({
+        id: users.id,
+        email: users.email,
+        displayName: users.displayName,
+        createdAt: users.createdAt,
+    });
     return newUser;
 }
 

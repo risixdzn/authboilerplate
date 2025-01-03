@@ -1,11 +1,5 @@
 import { z } from "zod";
 
-export interface createUser {
-    displayName?: string | null;
-    email: string;
-    password: string;
-}
-
 export const createUserSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
     password: z
@@ -19,22 +13,21 @@ export const createUserSchema = z.object({
     displayName: z.string().min(3).max(100).optional(),
 });
 
-export interface loginUser {
-    email: string;
-    password: string;
-}
-
 export const loginUserSchema = z.object({
     email: z.string().email(),
     password: z.string(),
 });
 
-export interface nonSensitiveUser {
-    id: string;
-    displayName: string | null;
-    email: string;
-    createdAt: Date;
-}
+export const nonSensitiveUser = z
+    .object({
+        id: z.string().cuid2(),
+        email: z.string().email({ message: "Invalid email address" }),
+        displayName: z.string().min(3).max(100).optional(),
+        createdAt: z.date(),
+    })
+    .describe(
+        "Representing the user object, contains only non-sentitive data. User password will **NEVER** be returned in responses, not even in hashed format."
+    );
 
 export const verifyEmailSchema = z.object({
     token: z.string(),

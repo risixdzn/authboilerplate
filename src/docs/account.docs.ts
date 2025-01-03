@@ -2,6 +2,7 @@ import { FastifySchema } from "fastify";
 import { zodResponseSchema } from "./types";
 import { z } from "zod";
 import { editAccountSchema as editAccountBodySchema } from "../interfaces/account";
+import { nonSensitiveUser } from "../interfaces/auth";
 
 const getAccountSchema: FastifySchema = {
     tags: ["Account"],
@@ -20,12 +21,7 @@ const getAccountSchema: FastifySchema = {
             error: null,
             code: "get_account_success",
             message: "Account retrieved successfully.",
-            data: z.object({
-                id: z.string(),
-                displayName: z.string().optional().nullable(),
-                email: z.string().email(),
-                createdAt: z.date(),
-            }),
+            data: nonSensitiveUser,
         }).describe("Account retrieved successfully."),
     },
     security: [{ JWT: [] }],
@@ -49,12 +45,7 @@ const editAccountSchema: FastifySchema = {
             error: null,
             code: "update_account_success",
             message: "Account data updated successfully",
-            data: z.object({
-                id: z.string(),
-                displayName: z.string().optional().nullable(),
-                email: z.string().email(),
-                createdAt: z.date(),
-            }),
+            data: nonSensitiveUser,
         }).describe("Account data updated successfully."),
     },
     security: [{ JWT: [] }],

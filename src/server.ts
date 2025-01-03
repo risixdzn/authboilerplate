@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import { fastify } from "fastify";
 import {
+    createJsonSchemaTransformObject,
     jsonSchemaTransform,
     serializerCompiler,
     validatorCompiler,
@@ -24,6 +25,7 @@ import { apiDescription } from "./docs/main";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { cwd } from "process";
+import { nonSensitiveUser } from "./interfaces/auth";
 
 //Set Zod as the default request/response data serializer
 const server = fastify().withTypeProvider<ZodTypeProvider>();
@@ -49,6 +51,10 @@ server.register(fastifySwagger, {
                 name: "Account",
                 description: "Edit account data or delete it through these routes.",
             },
+            {
+                name: "Credentials",
+                description: "Change account credentials (password) in different ways.",
+            },
         ],
         security: [],
         components: {
@@ -62,6 +68,11 @@ server.register(fastifySwagger, {
         },
     },
     transform: jsonSchemaTransform,
+    transformObject: createJsonSchemaTransformObject({
+        schemas: {
+            User: nonSensitiveUser,
+        },
+    }),
 });
 
 //Set Scalar as the frontend for the docs
@@ -75,6 +86,7 @@ server.register(scalarUi, {
         metaData: {
             title: "Docs - Auth Boilerplate API",
         },
+        favicon: "/public/favicon.svg",
         theme: "none",
     },
 });

@@ -1,5 +1,4 @@
 import { FastifyRequest } from "fastify";
-import { z } from "zod";
 
 import { loginHandler } from "../controllers/auth/loginHandler";
 import { registerHandler } from "../controllers/auth/registerHandler";
@@ -8,7 +7,6 @@ import { verifyHandler } from "../controllers/auth/verifyHandler";
 import { authDocs } from "../docs/auth.docs";
 import { createUserSchema, loginUserSchema, verifyEmailSchema } from "../interfaces/auth";
 import { FastifyTypedInstance } from "../interfaces/fastify";
-import { authenticate } from "../middlewares/authenticate";
 
 export async function authRoutes(fastify: FastifyTypedInstance) {
     fastify.post(
