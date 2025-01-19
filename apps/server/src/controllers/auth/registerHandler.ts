@@ -8,6 +8,7 @@ import { emailDisplayName, sendAccountVerificationEmail } from "../../helpers/ma
 import { createUserSchema } from "@repo/schemas/auth";
 import { createUser, deleteUser, queryUserByEmail } from "../../services/auth.services";
 import { createOneTimeToken } from "../../services/tokens.services";
+import { env } from "@/src/env";
 
 export async function registerHandler({
     body,
@@ -49,7 +50,9 @@ export async function registerHandler({
         tokenType: "confirmation",
     });
 
-    const verificationUrl = `${request.protocol}://${request.host}/auth/verify?token=${oneTimeToken.token}`;
+    const redirectUrl = `${env.FRONTEND_URL}/auth/login`;
+
+    const verificationUrl = `${request.protocol}://${request.host}/auth/verify?token=${oneTimeToken.token}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
 
     const verificationEmail = await sendAccountVerificationEmail({
         to: newUser.email,

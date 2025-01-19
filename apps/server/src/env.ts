@@ -10,6 +10,7 @@ const envSchema = z.object({
     EMAIL_DOMAIN: z.string(),
     APP_NAME: z.string(),
     NODE_PORT: z.string(),
+    FRONTEND_URL: z.string().url(),
 });
 
 export const env = envSchema.parse(process.env);

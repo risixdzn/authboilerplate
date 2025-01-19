@@ -1,10 +1,4 @@
-export type ApiResponse = {
-    status: number;
-    error: string | null;
-    message: string;
-    code: string;
-    data: unknown | null;
-};
+import { type ApiResponse } from "@repo/schemas/utils";
 
 export const apiResponse = ({ status, error, message, code, data }: ApiResponse) => {
     return { status, error, message, code, data };

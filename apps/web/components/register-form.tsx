@@ -1,25 +1,24 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { api, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { createUserSchema as baseCreateUserSchema } from "@repo/schemas/auth";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "./ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
+import { Dispatch, SetStateAction, useState } from "react";
+import axios, { AxiosError } from "axios";
+import { toast } from "@pheralb/toast";
+import { messages } from "@/lib/messages";
+import { type ApiResponse } from "@repo/schemas/utils";
+import { Loader2 } from "lucide-react";
 
-export function RegisterForm({ className, ...props }: React.ComponentPropsWithoutRef<"form">) {
+export function RegisterForm({ onSuccess }: { onSuccess: Dispatch<SetStateAction<boolean>> }) {
+    const [loading, setLoading] = useState(false);
+
     const createUserSchema = baseCreateUserSchema
         .extend({
             password: z
@@ -38,7 +37,9 @@ export function RegisterForm({ className, ...props }: React.ComponentPropsWithou
                 .refine((password) => /[#?!@$%^&*-]/.test(password), {
                     message: "Must contain at least one special character.",
                 }),
-            confirmPassword: z.string().min(1, { message: "Confirm your password." }),
+            confirmPassword: z
+                .string({ required_error: "Please confirm your password." })
+                .min(1, { message: "Confirm your password." }),
         })
         .refine((data) => data.password === data.confirmPassword, {
             message: "Passwords do not match.",
@@ -48,24 +49,41 @@ export function RegisterForm({ className, ...props }: React.ComponentPropsWithou
     const form = useForm<z.infer<typeof createUserSchema>>({
         resolver: zodResolver(createUserSchema),
         defaultValues: {
-            displayName: "",
             email: "",
             password: "",
         },
-        mode: "onTouched",
+        mode: "all",
     });
 
-    function onSubmit(values: z.infer<typeof createUserSchema>) {
-        console.log(values);
+    const { formState } = form;
+
+    async function onSubmit(values: z.infer<typeof createUserSchema>) {
+        setLoading(true);
+        try {
+            const res = await axios.post<ApiResponse>(api("/auth/register"), values);
+            if (res.status === 201) {
+                toast.success({
+                    text: messages[res.data.code]?.title!,
+                    description: messages[res.data.code]?.title!,
+                });
+            }
+            onSuccess(true);
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                const errorData = error.response?.data as ApiResponse;
+                toast.error({
+                    text: messages[errorData.code]?.title!,
+                    description: messages[errorData.code]?.description!,
+                });
+            }
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
         <Form {...form}>
-            <form
-                className={cn("flex flex-col gap-6", className)}
-                onSubmit={form.handleSubmit(onSubmit)}
-                {...props}
-            >
+            <form className={cn("flex flex-col gap-6")} onSubmit={form.handleSubmit(onSubmit)}>
                 <div className='flex flex-col items-center gap-2 text-center'>
                     <h1 className='text-2xl font-bold tracking-tight'>Create a new account</h1>
                     <p className='text-balance text-sm text-muted-foreground'>
@@ -156,12 +174,12 @@ export function RegisterForm({ className, ...props }: React.ComponentPropsWithou
                     Login with GitHub
                 </Button> */}
                 </div>
-                <Button type='submit' className='w-full'>
-                    Register
+                <Button type='submit' className='w-full' disabled={loading || !formState.isValid}>
+                    {!loading ? "Register" : <Loader2 className='animate-spin size-4' />}
                 </Button>
                 <div className='text-center text-sm'>
                     Got an account?{" "}
-                    <Link href='/login' className='underline underline-offset-4'>
+                    <Link href='/auth/login' className='underline underline-offset-4'>
                         Sign in
                     </Link>
                 </div>

@@ -9,10 +9,10 @@ import {
     Img,
     Link,
     Preview,
-    render,
     Section,
     Text,
 } from "@react-email/components";
+import { render } from "@react-email/render";
 
 interface EmailProps {
     displayName: string;
@@ -124,11 +124,16 @@ export function renderEmail({
     displayName: string;
     appName: string;
 }): string {
-    return render(
-        <VerificationEmail
-            verificationUrl={verificationUrl}
-            displayName={displayName}
-            appName={appName}
-        />
-    );
+    try {
+        return render(
+            <VerificationEmail
+                verificationUrl={verificationUrl}
+                displayName={displayName}
+                appName={appName}
+            />
+        );
+    } catch (error) {
+        console.error("Failed to render email", error);
+        throw new Error(`Failed to render email ${error}`);
+    }
 }

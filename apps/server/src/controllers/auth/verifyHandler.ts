@@ -4,12 +4,15 @@ import { apiResponse } from "@/src/helpers/response";
 
 import { setUserVerified } from "../../services/auth.services";
 import { deleteOneTimeToken, queryOneTimeToken } from "../../services/tokens.services";
+import { env } from "@/src/env";
 
 export async function verifyHandler({
     token,
+    redirectUrl,
     response,
 }: {
     token: string;
+    redirectUrl?: string;
     response: FastifyReply;
 }) {
     const oneTimeToken = await queryOneTimeToken(token);
@@ -52,6 +55,18 @@ export async function verifyHandler({
     //If all checks succeed, update the user to be verified and delete the token
     await setUserVerified(oneTimeToken.user.id);
     await deleteOneTimeToken(oneTimeToken.token);
+
+    if (redirectUrl) {
+        return response
+            .setCookie("showVerifiedDialog", "true", {
+                path: "/",
+                httpOnly: false,
+                sameSite: "lax",
+                secure: true,
+            })
+            .status(302)
+            .redirect(decodeURIComponent(redirectUrl));
+    }
 
     return response.status(200).send(
         apiResponse({

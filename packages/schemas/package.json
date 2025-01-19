@@ -19,6 +19,10 @@
         "./credentials": {
             "types": "./src/credentials.ts",
             "default": "./dist/credentials.js"
+        },
+        "./utils": {
+            "types": "./src/utils.ts",
+            "default": "./dist/utils.js"
         }
     },
     "devDependencies": {

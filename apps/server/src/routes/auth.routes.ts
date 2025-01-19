@@ -30,11 +30,14 @@ export async function authRoutes(fastify: FastifyTypedInstance) {
     fastify.get(
         "/verify",
         { schema: authDocs.verifySchema },
-        async (request: FastifyRequest<{ Querystring: { token: string } }>, response) => {
+        async (
+            request: FastifyRequest<{ Querystring: { token: string; redirectUrl?: string } }>,
+            response
+        ) => {
             const query = await verifyEmailSchema.parseAsync(request.query);
 
             console.log(query.token);
-            await verifyHandler({ token: query.token, response });
+            await verifyHandler({ token: query.token, redirectUrl: query.redirectUrl, response });
         }
     );
 
