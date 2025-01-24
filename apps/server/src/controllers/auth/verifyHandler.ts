@@ -61,7 +61,7 @@ export async function verifyHandler({
             .setCookie("showVerifiedDialog", "true", {
                 path: "/",
                 httpOnly: false,
-                sameSite: "lax",
+                sameSite: "none",
                 secure: true,
             })
             .status(302)

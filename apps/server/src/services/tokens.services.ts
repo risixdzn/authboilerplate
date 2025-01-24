@@ -1,9 +1,9 @@
-import { eq } from 'drizzle-orm';
-import { FastifyReply } from 'fastify';
+import { eq } from "drizzle-orm";
+import { FastifyReply } from "fastify";
 
-import { db } from '../db/connection';
-import { oneTimeTokens, refreshTokens, users } from '../db/schema';
-import { generateOneTimeToken } from '../helpers/tokens';
+import { db } from "../db/connection";
+import { oneTimeTokens, refreshTokens, users } from "../db/schema";
+import { generateOneTimeToken } from "../helpers/tokens";
 
 export interface RefreshToken {
     token: string;
@@ -14,6 +14,9 @@ export async function setRefreshToken(response: FastifyReply, token: RefreshToke
     const cookieOptions = {
         httpOnly: true,
         expires: token.expires, // Adds 7 days to the current date
+        path: "/",
+        sameSite: "none" as const,
+        secure: true,
     };
 
     const [existing] = await db
@@ -32,6 +35,19 @@ export async function setRefreshToken(response: FastifyReply, token: RefreshToke
     });
 
     response.setCookie("refreshToken", token.token, cookieOptions);
+}
+
+export async function setJWTCookie(response: FastifyReply, token: string) {
+    const cookieOptions = {
+        path: "/",
+        httpOnly: false,
+        sameSite: "none" as const,
+        expires: new Date(Date.now() + 10 * 1000),
+        // expires: new Date(Date.now() + 5 * 60 * 1000),
+        secure: true,
+    };
+
+    response.setCookie("token", token, cookieOptions);
 }
 
 export async function createOneTimeToken({

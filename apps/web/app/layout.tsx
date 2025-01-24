@@ -35,7 +35,7 @@ export default function RootLayout({
                 className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased font-[family-name:var(--font-inter)]`}
             >
                 {children}
-                <Toaster />
+                <Toaster theme='light' toastFont='Inter' />
             </body>
         </html>
     );

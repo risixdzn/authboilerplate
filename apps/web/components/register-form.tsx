@@ -10,9 +10,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Dispatch, SetStateAction, useState } from "react";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
+import { axios } from "@/lib/auth/axios";
 import { toast } from "@pheralb/toast";
-import { messages } from "@/lib/messages";
+import { fallbackMessages, messages } from "@/lib/messages";
 import { type ApiResponse } from "@repo/schemas/utils";
 import { Loader2 } from "lucide-react";
 
@@ -60,20 +61,24 @@ export function RegisterForm({ onSuccess }: { onSuccess: Dispatch<SetStateAction
     async function onSubmit(values: z.infer<typeof createUserSchema>) {
         setLoading(true);
         try {
-            const res = await axios.post<ApiResponse>(api("/auth/register"), values);
+            const res = await axios.client.post<ApiResponse>(api("/auth/register"), values);
+            const message = messages[res.data.code] ?? fallbackMessages.success;
+
             if (res.status === 201) {
                 toast.success({
-                    text: messages[res.data.code]?.title!,
-                    description: messages[res.data.code]?.title!,
+                    text: message.title,
+                    description: message.description,
                 });
             }
             onSuccess(true);
         } catch (error) {
             if (error instanceof AxiosError) {
                 const errorData = error.response?.data as ApiResponse;
+                const message = messages[errorData.code] ?? fallbackMessages.error;
+
                 toast.error({
-                    text: messages[errorData.code]?.title!,
-                    description: messages[errorData.code]?.description!,
+                    text: message.title,
+                    description: message.description,
                 });
             }
         } finally {

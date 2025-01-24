@@ -1,8 +1,12 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const editAccountSchema = z
     .object({
-        displayName: z.string().min(3).max(100).optional(),
+        displayName: z
+            .string()
+            .min(3, { message: "Must be at least 3 characters long." })
+            .max(100, { message: "Oops! Too long..." })
+            .optional(),
     })
     .refine(
         (data: { [key: string]: string }) =>
