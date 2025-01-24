@@ -26,8 +26,22 @@ import { join } from "path";
 import { cwd } from "process";
 import { nonSensitiveUser } from "@repo/schemas/auth";
 
+const envToLogger = {
+    development: {
+        transport: {
+            target: "pino-pretty",
+            options: {
+                ignore: "pid,hostname",
+                translateTime: "HH:MM:ss Z",
+            },
+        },
+    },
+    production: true,
+    test: false,
+};
+
 //Set Zod as the default request/response data serializer
-const server = fastify().withTypeProvider<ZodTypeProvider>();
+const server = fastify({ logger: envToLogger["development"] }).withTypeProvider<ZodTypeProvider>();
 
 server.setValidatorCompiler(validatorCompiler);
 server.setSerializerCompiler(serializerCompiler);
@@ -129,7 +143,10 @@ server.get("/", (_, reply) => {
     reply.status(200).send("OK");
 });
 
-server.register(fastifyCors, { origin: "*" });
+server.register(fastifyCors, {
+    origin: [env.FRONTEND_URL, `http://localhost:${env.NODE_PORT}`],
+    credentials: true,
+});
 
 //Map the zod errors to standart response
 server.setErrorHandler((error, request, reply) => {

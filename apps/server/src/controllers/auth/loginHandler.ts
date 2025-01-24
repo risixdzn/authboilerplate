@@ -8,7 +8,7 @@ import { signJWT } from "../../helpers/jwt";
 import { generateRefreshToken } from "../../helpers/tokens";
 import { loginUserSchema } from "@repo/schemas/auth";
 import { queryUserByEmail } from "../../services/auth.services";
-import { setRefreshToken } from "../../services/tokens.services";
+import { setJWTCookie, setRefreshToken } from "../../services/tokens.services";
 
 export async function loginHandler({
     body,
@@ -72,6 +72,7 @@ export async function loginHandler({
 
     const refreshToken = generateRefreshToken();
     await setRefreshToken(response, refreshToken, user.id);
+    await setJWTCookie(response, token);
 
     return response.status(200).send(
         apiResponse({

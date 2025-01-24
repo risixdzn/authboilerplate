@@ -11,4 +11,31 @@ export const messages: { [key: string]: { title: string; description: string } }
         title: "Account created.",
         description: "Check your email to activate it.",
     },
+    invalid_password: {
+        title: "Wrong password",
+        description: "Check your typing and try again.",
+    },
+    email_not_verified: {
+        title: "Email not verified",
+        description: "Click the link sent to your email and try again.",
+    },
+    user_not_found: {
+        title: "User not found",
+        description: "We couldn't find any user with this credentials.",
+    },
+    login_success: {
+        title: "Logged in successfully!",
+        description: "You will be redirected soon...",
+    },
+};
+
+export const fallbackMessages = {
+    success: {
+        title: "Success!",
+        description: "Your request was completed successfully.",
+    },
+    error: {
+        title: "Oops! Something went wrong.",
+        description: "We couldn't process your request. Please check your input and try again.",
+    },
 };

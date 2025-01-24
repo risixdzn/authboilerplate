@@ -9,7 +9,7 @@ export function signJWT({
     payload: z.infer<typeof nonSensitiveUser>;
     expiresIn?: string | number;
 }): string {
-    return server.jwt.sign(payload, { expiresIn: expiresIn ?? "300s" });
+    return server.jwt.sign(payload, { expiresIn: expiresIn ?? "10s" });
 }
 
 export function verifyJWT(token: string) {
