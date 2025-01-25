@@ -20,7 +20,7 @@ export const createUserSchema = z.object({
         .refine((value) => value === undefined || value.length >= 3, {
             message: "Name must be at least 3 characters.",
         })
-        .refine((value) => value === undefined || value.length <= 100, {
+        .refine((value) => value === undefined || value.length <= 64, {
             message: "Name too long.",
         }),
 });

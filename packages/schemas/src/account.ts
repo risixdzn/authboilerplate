@@ -5,7 +5,7 @@ export const editAccountSchema = z
         displayName: z
             .string()
             .min(3, { message: "Must be at least 3 characters long." })
-            .max(100, { message: "Oops! Too long..." })
+            .max(64, { message: "Oops! Too long..." })
             .optional(),
     })
     .refine(

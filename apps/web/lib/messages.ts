@@ -27,6 +27,18 @@ export const messages: { [key: string]: { title: string; description: string } }
         title: "Logged in successfully!",
         description: "You will be redirected soon...",
     },
+    update_account_success: {
+        title: "Account updated sucessfully!",
+        description: "Reload to see the changes.",
+    },
+    password_update_success: {
+        title: "Password updated successfully!",
+        description: "Use your new password the next time you log in.",
+    },
+    equal_passwords: {
+        title: "Passwords match",
+        description: "Your new password cannot be the same as the current one.",
+    },
 };
 
 export const fallbackMessages = {
