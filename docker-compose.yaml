@@ -9,7 +9,7 @@ services:
         ports:
             - 5432:5432
         volumes:
-            - db:/var/lib/postgres 
+            - db:/var/lib/postgresql/data 
         healthcheck:
             test: ["CMD-SHELL", "pg_isready -U docker"]
             interval: 10s

@@ -1,7 +1,6 @@
 "use client";
 
 import { Dialog, DialogContent } from "./ui/dialog";
-import Link from "next/link";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { toast } from "@pheralb/toast";

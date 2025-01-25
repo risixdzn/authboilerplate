@@ -31,7 +31,7 @@ axiosClient.interceptors.request.use(
         const jwt = cookies["token"];
         const payload = parseJwt(jwt as string);
 
-        if (!jwt || (payload && payload.exp > Date.now() * 1000)) {
+        if (!jwt || (payload && payload.exp * 1000 < Date.now())) {
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/token`, {
                     method: "POST",
