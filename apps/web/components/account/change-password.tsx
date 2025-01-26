@@ -72,13 +72,9 @@ export function ChangePassword() {
     async function onSubmit(values: z.infer<typeof changePasswordAuthenticatedSchema>) {
         setLoading(true);
         try {
-            const res = await axios.client.put<ApiResponse>(
-                api("/credentials/password/change"),
-                values,
-                {
-                    withCredentials: true,
-                }
-            );
+            const res = await axios.client.put<ApiResponse>(api("/credentials/password"), values, {
+                withCredentials: true,
+            });
             if (res.status === 200) {
                 const message = messages[res.data.code] ?? fallbackMessages.success;
                 setOpen(false);

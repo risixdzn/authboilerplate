@@ -39,6 +39,19 @@ export const messages: { [key: string]: { title: string; description: string } }
         title: "Passwords match",
         description: "Your new password cannot be the same as the current one.",
     },
+    password_reset_request_accepted: {
+        title: "Reset request sent",
+        description: "Please check your email for instructions.",
+    },
+    existing_password_reset_request: {
+        title: "Request pending",
+        description:
+            "You already have a reset request. Complete it or wait 30 minutes for it to expire.",
+    },
+    token_expired: {
+        title: "Oops... Your time expired.",
+        description: "Please start over as 30 minutes passed since you started the reset.",
+    },
 };
 
 export const fallbackMessages = {
