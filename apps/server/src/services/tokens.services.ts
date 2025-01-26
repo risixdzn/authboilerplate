@@ -115,3 +115,7 @@ export async function deleteOneTimeToken(token: string) {
 export async function getUserOneTimeTokens(userId: string) {
     return await db.select().from(oneTimeTokens).where(eq(oneTimeTokens.userId, userId));
 }
+
+export async function getUserOneTimeTokensWithEmail(email: string) {
+    return await db.select().from(oneTimeTokens).where(eq(oneTimeTokens.relatesTo, email));
+}

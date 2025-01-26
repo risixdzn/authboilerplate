@@ -17,7 +17,6 @@ export async function accountRoutes(fastify: FastifyTypedInstance) {
         "/",
         { preHandler: authenticate, schema: accountDocs.getAccountSchema },
         async (request, response) => {
-            console.log("COOKIES", request.cookies);
             const userJwt = request.user as z.infer<typeof userJWT>;
 
             await getAccountHandler({ userId: userJwt.id, response });
