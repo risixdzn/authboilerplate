@@ -52,7 +52,7 @@ export async function registerHandler({
 
     const redirectUrl = `${env.FRONTEND_URL}/auth/login`;
 
-    const verificationUrl = `${request.protocol}://${request.host}/auth/verify?token=${oneTimeToken.token}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
+    const verificationUrl = `${request.protocol}://${request.host}/auth/verify?token=${encodeURIComponent(oneTimeToken.token)}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
 
     const verificationEmail = await sendAccountVerificationEmail({
         to: newUser.email,

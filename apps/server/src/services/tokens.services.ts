@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, gte, sql } from "drizzle-orm";
 import { FastifyReply } from "fastify";
 
 import { db } from "../db/connection";
@@ -110,6 +110,18 @@ export async function queryOneTimeToken(token: string) {
 
 export async function deleteOneTimeToken(token: string) {
     return await db.delete(oneTimeTokens).where(eq(oneTimeTokens.token, token));
+}
+
+export async function deleteUserExpiredTokensByUserId(userId: string) {
+    return await db
+        .delete(oneTimeTokens)
+        .where(and(eq(oneTimeTokens.userId, userId), gte(sql`NOW()`, oneTimeTokens.expiresAt)));
+}
+
+export async function deleteUserExpiredTokensByEmail(email: string) {
+    return await db
+        .delete(oneTimeTokens)
+        .where(and(eq(oneTimeTokens.relatesTo, email), gte(sql`NOW()`, oneTimeTokens.expiresAt)));
 }
 
 export async function getUserOneTimeTokens(userId: string) {

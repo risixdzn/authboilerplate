@@ -51,7 +51,9 @@ export async function credentialsRoutes(fastify: FastifyTypedInstance) {
         { schema: credentialDocs.validatePasswordResetTokenSchema },
         async (request: FastifyRequest<{ Querystring: { token: string } }>, response) => {
             const query = await z.object({ token: z.string() }).parseAsync(request.query);
-            await validatePasswordResetTokenHandler({ token: query.token, response });
+            const token = decodeURIComponent(query.token);
+
+            await validatePasswordResetTokenHandler({ token, response });
         }
     );
 }

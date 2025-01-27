@@ -1,17 +1,13 @@
-import { validatePasswordResetTokenSchema } from "./../../docs/credentials.docs";
 import { env } from "@/src/env";
 import { hashPassword } from "@/src/helpers/hash-password";
-import {
-    sendAccountDeletionEmail,
-    emailDisplayName,
-    sendPasswordResetEmail,
-} from "@/src/helpers/mailing";
+import { emailDisplayName, sendPasswordResetEmail } from "@/src/helpers/mailing";
 import { apiResponse } from "@/src/helpers/response";
 import { queryUserByEmail } from "@/src/services/auth.services";
 import { updateUserPassword } from "@/src/services/credentials.services";
 import {
     createOneTimeToken,
     deleteOneTimeToken,
+    deleteUserExpiredTokensByEmail,
     getUserOneTimeTokensWithEmail,
     queryOneTimeToken,
 } from "@/src/services/tokens.services";
@@ -26,6 +22,7 @@ export async function requestPasswordResetHandler({
     email: string;
     response: FastifyReply;
 }) {
+    await deleteUserExpiredTokensByEmail(email);
     const oneTimeTokens = await getUserOneTimeTokensWithEmail(email);
 
     for (const token of oneTimeTokens) {
