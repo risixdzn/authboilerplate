@@ -5,6 +5,7 @@ import { queryUserById } from "../../services/account.services";
 import { deleteUser } from "../../services/auth.services";
 import {
     createOneTimeToken,
+    deleteUserExpiredTokensByUserId,
     getUserOneTimeTokens,
     queryOneTimeToken,
 } from "../../services/tokens.services";
@@ -19,6 +20,7 @@ export async function requestAccountDeletionHandler({
     request: FastifyRequest;
     response: FastifyReply;
 }) {
+    await deleteUserExpiredTokensByUserId(userId);
     const oneTimeTokens = await getUserOneTimeTokens(userId);
 
     for (const token of oneTimeTokens) {
@@ -56,7 +58,7 @@ export async function requestAccountDeletionHandler({
         tokenType: "account_deletion",
     });
 
-    const verificationUrl = `${request.protocol}://${request.host}/account/confirm-deletion?token=${oneTimeToken.token}`;
+    const verificationUrl = `${request.protocol}://${request.host}/account/confirm-deletion?token=${encodeURIComponent(oneTimeToken.token)}`;
 
     await sendAccountDeletionEmail({
         to: user.email,

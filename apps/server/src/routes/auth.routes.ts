@@ -35,9 +35,9 @@ export async function authRoutes(fastify: FastifyTypedInstance) {
             response
         ) => {
             const query = await verifyEmailSchema.parseAsync(request.query);
+            const token = decodeURIComponent(query.token);
 
-            console.log(query.token);
-            await verifyHandler({ token: query.token, redirectUrl: query.redirectUrl, response });
+            await verifyHandler({ token, redirectUrl: query.redirectUrl, response });
         }
     );
 
