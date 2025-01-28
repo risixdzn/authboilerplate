@@ -1,6 +1,6 @@
 "use client";
 
-import AuthFormSuccess from "@/components/auth-form-success";
+import AuthFormSuccess from "@/components/auth/auth-form-success";
 import { ForgotPasswordForm } from "@/components/forgot-password-form";
 import { useState } from "react";
 

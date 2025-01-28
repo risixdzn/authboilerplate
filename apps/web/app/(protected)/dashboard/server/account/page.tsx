@@ -1,4 +1,4 @@
-import { SignOutButton } from "@/components/signout-button";
+import { SignOutButton } from "@/components/auth/signout-button";
 import { Button } from "@/components/ui/button";
 import { axios } from "@/lib/auth/axios";
 import Link from "next/link";

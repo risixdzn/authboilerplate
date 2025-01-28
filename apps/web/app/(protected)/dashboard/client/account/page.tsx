@@ -1,6 +1,6 @@
 "use client";
 
-import { SignOutButton } from "@/components/signout-button";
+import { SignOutButton } from "@/components/auth/signout-button";
 import { axios } from "@/lib/auth/axios";
 import { useQuery } from "@tanstack/react-query";
 import { nonSensitiveUser } from "@repo/schemas/auth";

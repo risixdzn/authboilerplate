@@ -4,51 +4,24 @@ import { api, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { createUserSchema as baseCreateUserSchema } from "@repo/schemas/auth";
+import { loginUserSchema } from "@repo/schemas/auth";
+import { fallbackMessages, messages } from "@/lib/messages";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "@pheralb/toast";
+import { ApiResponse } from "@repo/schemas/utils";
+import axios, { AxiosError } from "axios";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
-import { Dispatch, SetStateAction, useState } from "react";
-import { AxiosError } from "axios";
-import { axios } from "@/lib/auth/axios";
-import { toast } from "@pheralb/toast";
-import { fallbackMessages, messages } from "@/lib/messages";
-import { type ApiResponse } from "@repo/schemas/utils";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-export function RegisterForm({ onSuccess }: { onSuccess: Dispatch<SetStateAction<boolean>> }) {
+export function LoginForm() {
     const [loading, setLoading] = useState(false);
 
-    const createUserSchema = baseCreateUserSchema
-        .extend({
-            password: z
-                .string()
-                .min(8, { message: "Must be at least 8 characters long." })
-                .max(128, { message: "Must be at most 128 characters long." })
-                .refine((password) => /[A-Z]/.test(password), {
-                    message: "Must contain at least one uppercase letter.",
-                })
-                .refine((password) => /[a-z]/.test(password), {
-                    message: "Must contain at least one lowercase letter.",
-                })
-                .refine((password) => /[0-9]/.test(password), {
-                    message: "Must contain at least one number.",
-                })
-                .refine((password) => /[#?!@$%^&*-]/.test(password), {
-                    message: "Must contain at least one special character.",
-                }),
-            confirmPassword: z
-                .string({ required_error: "Please confirm your password." })
-                .min(1, { message: "Confirm your password." }),
-        })
-        .refine((data) => data.password === data.confirmPassword, {
-            message: "Passwords do not match.",
-            path: ["confirmPassword"],
-        });
-
-    const form = useForm<z.infer<typeof createUserSchema>>({
-        resolver: zodResolver(createUserSchema),
+    const form = useForm<z.infer<typeof loginUserSchema>>({
+        resolver: zodResolver(loginUserSchema),
         defaultValues: {
             email: "",
             password: "",
@@ -58,19 +31,23 @@ export function RegisterForm({ onSuccess }: { onSuccess: Dispatch<SetStateAction
 
     const { formState } = form;
 
-    async function onSubmit(values: z.infer<typeof createUserSchema>) {
+    const router = useRouter();
+
+    async function onSubmit(values: z.infer<typeof loginUserSchema>) {
         setLoading(true);
         try {
-            const res = await axios.client.post<ApiResponse>(api("/auth/register"), values);
-            const message = messages[res.data.code] ?? fallbackMessages.success;
+            const res = await axios.post<ApiResponse>(api("/auth/login"), values, {
+                withCredentials: true,
+            });
+            if (res.status === 200) {
+                const message = messages[res.data.code] ?? fallbackMessages.success;
 
-            if (res.status === 201) {
                 toast.success({
                     text: message.title,
                     description: message.description,
                 });
+                router.push("/dashboard/client/account");
             }
-            onSuccess(true);
         } catch (error) {
             if (error instanceof AxiosError) {
                 const errorData = error.response?.data as ApiResponse;
@@ -90,12 +67,12 @@ export function RegisterForm({ onSuccess }: { onSuccess: Dispatch<SetStateAction
         <Form {...form}>
             <form className={cn("flex flex-col gap-6")} onSubmit={form.handleSubmit(onSubmit)}>
                 <div className='flex flex-col items-center gap-2 text-center'>
-                    <h1 className='text-2xl font-bold tracking-tight'>Create a new account</h1>
+                    <h1 className='text-2xl font-bold tracking-tight'>Login to your account</h1>
                     <p className='text-balance text-sm text-muted-foreground'>
-                        Fill in the form below to get started
+                        Enter your email below to login to your account
                     </p>
                 </div>
-                <div className='grid gap-2'>
+                <div className='grid gap-6'>
                     <FormField
                         control={form.control}
                         name='email'
@@ -116,23 +93,18 @@ export function RegisterForm({ onSuccess }: { onSuccess: Dispatch<SetStateAction
                     />
                     <FormField
                         control={form.control}
-                        name='displayName'
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Name</FormLabel>
-                                <FormControl>
-                                    <Input type='text' placeholder='John Doe' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
                         name='password'
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Password *</FormLabel>
+                                <div className='flex items-center'>
+                                    <FormLabel>Password *</FormLabel>
+                                    <Link
+                                        href='/auth/forgot-password'
+                                        className='ml-auto text-sm underline-offset-4 hover:underline'
+                                    >
+                                        Forgot your password?
+                                    </Link>
+                                </div>
                                 <FormControl>
                                     <Input
                                         type='password'
@@ -145,25 +117,13 @@ export function RegisterForm({ onSuccess }: { onSuccess: Dispatch<SetStateAction
                             </FormItem>
                         )}
                     />
-                    <FormField
-                        control={form.control}
-                        name='confirmPassword'
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Confirm password *</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        type='password'
-                                        placeholder='••••••••'
-                                        required
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
+                    <Button
+                        type='submit'
+                        className='w-full'
+                        disabled={loading || !formState.isValid}
+                    >
+                        {!loading ? "Login" : <Loader2 className='animate-spin size-4' />}
+                    </Button>
                     {/* <div className='relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border'>
                     <span className='relative z-10 bg-background px-2 text-muted-foreground'>
                         Or continue with
@@ -179,13 +139,10 @@ export function RegisterForm({ onSuccess }: { onSuccess: Dispatch<SetStateAction
                     Login with GitHub
                 </Button> */}
                 </div>
-                <Button type='submit' className='w-full' disabled={loading || !formState.isValid}>
-                    {!loading ? "Register" : <Loader2 className='animate-spin size-4' />}
-                </Button>
                 <div className='text-center text-sm'>
-                    Got an account?{" "}
-                    <Link href='/auth/login' className='underline underline-offset-4'>
-                        Sign in
+                    Don&apos;t have an account?{" "}
+                    <Link href='/auth/register' className='underline underline-offset-4'>
+                        Sign up
                     </Link>
                 </div>
             </form>
