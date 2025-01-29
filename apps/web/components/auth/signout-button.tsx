@@ -1,7 +1,7 @@
 "use client";
 
 import React, { FormEvent } from "react";
-import { Button, ButtonProps } from "./ui/button";
+import { Button, ButtonProps } from "../ui/button";
 import { LogOut } from "lucide-react";
 import { toast } from "@pheralb/toast";
 import { useRouter } from "next/navigation";
