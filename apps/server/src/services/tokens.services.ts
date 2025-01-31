@@ -19,22 +19,24 @@ export async function setRefreshToken(response: FastifyReply, token: RefreshToke
         secure: true,
     };
 
-    const [existing] = await db
-        .select()
-        .from(refreshTokens)
-        .where(eq(refreshTokens.userId, userId));
-
-    if (existing) {
-        await db.delete(refreshTokens).where(eq(refreshTokens.userId, userId));
-    }
-
+    /**
+     * We need to allow multiple sessions per user, so we insert the token and then delete only the expired ones, not all.
+     */
     await db.insert(refreshTokens).values({
         expiresAt: token.expires,
         token: token.token,
         userId: userId,
     });
 
+    await db
+        .delete(refreshTokens)
+        .where(and(gte(sql`NOW()`, refreshTokens.expiresAt), eq(refreshTokens.userId, userId)));
+
     response.setCookie("refreshToken", token.token, cookieOptions);
+}
+
+export async function deleteRefreshToken(token: string) {
+    return await db.delete(refreshTokens).where(eq(refreshTokens.token, token));
 }
 
 export async function setJWTCookie(response: FastifyReply, token: string) {

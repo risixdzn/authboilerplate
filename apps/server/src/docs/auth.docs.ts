@@ -84,7 +84,9 @@ const revalidateSchema: FastifySchema = {
         
 Needs a \`refreshToken\` cookie, received from \`/auth/login\`, to succeed.
 
-This should be used when the short lived \`JWT\` expires.        
+This should be used when the short lived \`JWT\` expires.
+
+Will invalidate the passed \`refreshToken\` if all checks succeed and return a new one.        
         `,
     summary: "Revalidate JWT",
     response: {
