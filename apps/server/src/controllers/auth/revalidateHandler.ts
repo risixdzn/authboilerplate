@@ -5,7 +5,7 @@ import { apiResponse } from "@/src/helpers/response";
 import { signJWT } from "../../helpers/jwt";
 import { generateRefreshToken } from "../../helpers/tokens";
 import { queryTokenData } from "../../services/auth.services";
-import { setJWTCookie, setRefreshToken } from "../../services/tokens.services";
+import { deleteRefreshToken, setJWTCookie, setRefreshToken } from "../../services/tokens.services";
 
 /*
 This function is used to revalidate the JWT token
@@ -72,6 +72,11 @@ export async function revalidateHandler({
             })
         );
     }
+
+    /**
+     * If all checks succeed, delete the used refreshToken, issue a new JWT and a new refreshToken
+     */
+    await deleteRefreshToken(tokenData.token);
 
     const jwt = signJWT({
         payload: {

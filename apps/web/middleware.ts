@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
     const token = request.cookies.get("token")?.value;
+    const refreshToken = request.cookies.get("refreshToken")?.value;
     const hasDeletedAccount = request.cookies.get("showDeletedDialog")?.value;
 
     const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard");
@@ -39,7 +40,7 @@ export async function middleware(request: NextRequest) {
         }
 
         // If the user is at the loginPath and has a valid token, they need to go to dashboard.
-        if (token) {
+        if (token || refreshToken) {
             return NextResponse.redirect(new URL("/dashboard/client/account", request.url));
         }
 
@@ -48,8 +49,11 @@ export async function middleware(request: NextRequest) {
 
     //Revalidate the user JWT if its not present (cookie expired)
     if (!token) {
+        console.log("here");
         try {
+            console.log("here1");
             const response = await revalidate(request, isProtectedRoute);
+            console.log("here2");
             return response;
         } catch (error) {
             console.error("Error during token revalidation:", error);
@@ -83,6 +87,14 @@ async function revalidate(request: NextRequest, isProtectedRoute: boolean) {
             res.headers.set("Set-Cookie", setCookie);
             return res;
         }
+    }
+
+    // If refreshToken is invalid (401), clear cookies to prevent infinite loop
+    if (revalidateResponse.status === 401) {
+        const res = NextResponse.redirect(new URL("/auth/login", request.url));
+        res.cookies.delete("refreshToken");
+        res.cookies.delete("token");
+        return res;
     }
 
     // Revalidation failed; redirect to login
