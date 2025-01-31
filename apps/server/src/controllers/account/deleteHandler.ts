@@ -10,6 +10,7 @@ import {
     queryOneTimeToken,
 } from "../../services/tokens.services";
 import { apiResponse } from "@/src/helpers/response";
+import { env } from "@/src/env";
 
 export async function requestAccountDeletionHandler({
     userId,
@@ -58,7 +59,9 @@ export async function requestAccountDeletionHandler({
         tokenType: "account_deletion",
     });
 
-    const verificationUrl = `${request.protocol}://${request.host}/account/confirm-deletion?token=${encodeURIComponent(oneTimeToken.token)}`;
+    const redirectUrl = `${env.FRONTEND_URL}/auth/login`;
+
+    const verificationUrl = `${request.protocol}://${request.host}/account/confirm-deletion?token=${encodeURIComponent(oneTimeToken.token)}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
 
     await sendAccountDeletionEmail({
         to: user.email,
@@ -79,9 +82,11 @@ export async function requestAccountDeletionHandler({
 
 export async function confirmAccountDeletionHandler({
     token,
+    redirectUrl,
     response,
 }: {
     token: string;
+    redirectUrl?: string;
     response: FastifyReply;
 }) {
     const oneTimeToken = await queryOneTimeToken(token);
@@ -123,6 +128,18 @@ export async function confirmAccountDeletionHandler({
 
     //If all checks succeed, delete the user and the token will be automatically cascade deleted
     await deleteUser(oneTimeToken.user.id);
+
+    if (redirectUrl) {
+        return response
+            .setCookie("showDeletedDialog", "true", {
+                path: "/",
+                httpOnly: false,
+                sameSite: "none",
+                secure: true,
+            })
+            .status(302)
+            .redirect(decodeURIComponent(redirectUrl));
+    }
 
     return response.status(200).send(
         apiResponse({

@@ -1,12 +1,20 @@
 import { cn } from "@/lib/utils";
 import { forwardRef, HTMLAttributes } from "react";
 
-export const SettingsCard = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-    ({ children, className, ...props }, ref) => {
+interface SettingsCardProps extends HTMLAttributes<HTMLDivElement> {
+    destructive?: boolean;
+}
+
+export const SettingsCard = forwardRef<HTMLDivElement, SettingsCardProps>(
+    ({ children, className, destructive, ...props }, ref) => {
         return (
             <div
                 ref={ref}
-                className={cn("bg-card border border-border pt-6 rounded-lg space-y-2", className)}
+                className={cn(
+                    "bg-card border pt-6 rounded-lg space-y-2",
+                    destructive ? "border-destructive" : "border-border",
+                    className
+                )}
                 {...props}
             >
                 {children}
@@ -42,13 +50,19 @@ export const SettingsCardContent = forwardRef<HTMLDivElement, HTMLAttributes<HTM
 );
 SettingsCardContent.displayName = "SettingsCardContent";
 
-export const SettingsCardFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-    ({ children, className, ...props }, ref) => {
+interface SettingsCardFooterProps extends HTMLAttributes<HTMLDivElement> {
+    destructive?: boolean;
+}
+export const SettingsCardFooter = forwardRef<HTMLDivElement, SettingsCardFooterProps>(
+    ({ children, className, destructive, ...props }, ref) => {
         return (
             <div
                 ref={ref}
                 className={cn(
-                    "bg-accent border-border border-t px-6 py-4 w-full flex justify-between items-center gap-4",
+                    "border-t px-6 py-4 w-full flex justify-between items-center gap-4",
+                    destructive
+                        ? "bg-destructive/50 border-destructive"
+                        : "bg-accent border-border",
                     className
                 )}
                 {...props}

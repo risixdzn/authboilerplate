@@ -47,11 +47,18 @@ export async function accountRoutes(fastify: FastifyTypedInstance) {
     fastify.get(
         "/confirm-deletion",
         { schema: accountDocs.confirmDeletionSchema },
-        async (request: FastifyRequest<{ Querystring: { token: string } }>, response) => {
+        async (
+            request: FastifyRequest<{ Querystring: { token: string; redirectUrl?: string } }>,
+            response
+        ) => {
             const query = await confirmAccountDeletionSchema.parseAsync(request.query);
             const token = decodeURIComponent(query.token);
 
-            await confirmAccountDeletionHandler({ token, response });
+            await confirmAccountDeletionHandler({
+                token,
+                redirectUrl: query.redirectUrl,
+                response,
+            });
         }
     );
 }

@@ -18,4 +18,5 @@ export const editAccountSchema = z
 
 export const confirmAccountDeletionSchema = z.object({
     token: z.string(),
+    redirectUrl: z.string().optional(),
 });

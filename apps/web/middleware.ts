@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-// import { parseJwt } from "./lib/utils";
 
 export async function middleware(request: NextRequest) {
     const token = request.cookies.get("token")?.value;
+    const hasDeletedAccount = request.cookies.get("showDeletedDialog")?.value;
 
     const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard");
     const isLoginPath = request.nextUrl.pathname.startsWith("/auth/login");
@@ -16,7 +16,6 @@ export async function middleware(request: NextRequest) {
     if (isForgotPasswordTokenPath) {
         try {
             const tokenValidationResponse = await validatePasswordResetToken(request);
-
             if (!tokenValidationResponse) {
                 return NextResponse.redirect(new URL("/auth/login", request.url));
             }
@@ -26,11 +25,24 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    /**
-     * This excludes the login path to check if the user have a token.
-     * The login path is only on the matcher because we need to redirect to dashboard if the user already is logged in.
-     */
-    if (isLoginPath && !token) {
+    // Handle all login path cases first
+    if (isLoginPath) {
+        /**
+         * If the user has deleted his account, he will get redirected to the login path, but may still have a token active on cookies.
+         * This would crash the app, as the system would try to redirect him to the dashboard with a token related to a deleted account.
+         * So we check for the cookie that shows the dialog and ignore the redirection to the dashboard, also deleting the possible exis.
+         */
+        if (hasDeletedAccount) {
+            request.cookies.delete("refreshToken");
+            request.cookies.delete("token");
+            return NextResponse.next();
+        }
+
+        // If the user is at the loginPath and has a valid token, they need to go to dashboard.
+        if (token) {
+            return NextResponse.redirect(new URL("/dashboard/client/account", request.url));
+        }
+
         return NextResponse.next();
     }
 
@@ -48,11 +60,6 @@ export async function middleware(request: NextRequest) {
 
             return NextResponse.next();
         }
-    }
-
-    // If the user is at the loginPath and passed on the isLoginPath && !token early return, he is logged in and needs to go to dashboard.
-    if (isLoginPath) {
-        return NextResponse.redirect(new URL("/dashboard/client/account", request.url));
     }
 
     return NextResponse.next();
