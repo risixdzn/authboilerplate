@@ -49,11 +49,8 @@ export async function middleware(request: NextRequest) {
 
     //Revalidate the user JWT if its not present (cookie expired)
     if (!token) {
-        console.log("here");
         try {
-            console.log("here1");
             const response = await revalidate(request, isProtectedRoute);
-            console.log("here2");
             return response;
         } catch (error) {
             console.error("Error during token revalidation:", error);
