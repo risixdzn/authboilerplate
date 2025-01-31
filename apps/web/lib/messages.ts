@@ -52,6 +52,15 @@ export const messages: { [key: string]: { title: string; description: string } }
         title: "Oops... Your time expired.",
         description: "Please start over as 30 minutes passed since you started the reset.",
     },
+    deletion_request_accepted: {
+        title: "Deletion request sent",
+        description: "Please check your email for confirming.",
+    },
+    existing_deletion_request: {
+        title: "Request pending",
+        description:
+            "You already have a deletion request. Complete it or wait 30 minutes for it to expire.",
+    },
 };
 
 export const fallbackMessages = {

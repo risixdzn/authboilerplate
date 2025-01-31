@@ -93,10 +93,13 @@ const confirmDeletionSchema: FastifySchema = {
     description: `**Confirm deletion of account corresponding to the token.**
         
 When the confirmation email is sent, a link to this API route is sent together with the confirmation token.
+
+Once clicked, the account is deleted along with the single use token, then the user is redirected to the \`redirectUrl\`.
         `,
     summary: "Confirm deletion",
     querystring: z.object({
         token: z.string(),
+        redirectUrl: z.string().optional(),
     }),
     response: {
         404: zodResponseSchema({

@@ -12,14 +12,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Settings } from "@/components/account/settings";
 
 export default function ClientPage() {
-    const { isPending, error, data } = useQuery<
+    const { isPending, data } = useQuery<
         AxiosResponse<ApiResponse<z.infer<typeof nonSensitiveUser>>>
     >({
         queryKey: ["accountData"],
         queryFn: async () => await axios.client.get("/account"),
     });
 
-    if (error) return "An error has occurred: " + error.message;
+    // if (error) return "An error has occurred: " + error.message;
 
     const content = data?.data.data;
 

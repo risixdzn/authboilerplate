@@ -5,6 +5,7 @@ import {
     SettingsCardFooter,
 } from "../settings-card";
 import { ChangePassword } from "./change-password";
+import { DeleteAccount } from "./delete-account";
 import { EditDisplayName } from "./edit-display-name";
 
 export function Settings({ displayName }: { displayName: string }) {
@@ -38,6 +39,21 @@ export function Settings({ displayName }: { displayName: string }) {
                         Make sure to choose a strong and unique one.
                     </p>
                     <ChangePassword />
+                </SettingsCardFooter>
+            </SettingsCard>
+            <SettingsCard className='w-full' id='delete_account' destructive>
+                <SettingsCardTitle>Delete account</SettingsCardTitle>
+                <SettingsCardContent className='space-y-4'>
+                    <p className='text-sm'>
+                        Deleting your account is permanent and cannot be undone. This action will
+                        erase <b>all your data</b> and <b>data related to you</b>.
+                    </p>
+                </SettingsCardContent>
+                <SettingsCardFooter className='py-2' destructive>
+                    <p className='text-sm'>
+                        Please make sure you really want to proceed before confirming.
+                    </p>
+                    <DeleteAccount />
                 </SettingsCardFooter>
             </SettingsCard>
         </>
