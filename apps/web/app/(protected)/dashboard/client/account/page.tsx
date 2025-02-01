@@ -7,9 +7,10 @@ import { nonSensitiveUser } from "@repo/schemas/auth";
 import { z } from "zod";
 import { ApiResponse } from "@repo/schemas/utils";
 import { AxiosResponse } from "axios";
-import { User } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Settings } from "@/components/account/settings";
+import { Avatar } from "@/components/account/avatar";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export default function ClientPage() {
     const { isPending, data } = useQuery<
@@ -28,13 +29,18 @@ export default function ClientPage() {
             <div className='w-full max-w-6xl space-y-10'>
                 <div className='w-full flex items-center justify-between'>
                     <h1 className='text-2xl font-semibold tracking-tight'>Account (client)</h1>
-                    <SignOutButton variant={"outline"}>Signout</SignOutButton>
+                    <div className='flex gap-2'>
+                        <ModeToggle />
+                        <SignOutButton variant={"outline"}>Signout</SignOutButton>
+                    </div>
                 </div>
                 <div className='flex flex-col lg:flex-row gap-10'>
                     <div className='w-full lg:max-w-[20rem] space-y-4'>
-                        <div className='w-32 h-32 rounded-full bg-accent flex justify-center items-center'>
-                            <User className='size-10 text-muted-foreground' />
-                        </div>
+                        {!isPending ? (
+                            <Avatar identiconHash={content?.id} className='size-32' />
+                        ) : (
+                            <Skeleton className='w-32 h-32 rounded-full' />
+                        )}
                         {!isPending ? (
                             <div className='space-y-1'>
                                 <h2
