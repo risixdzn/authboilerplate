@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Toaster } from "@pheralb/toast";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ThemedToaster } from "@/components/themed-toaster";
 
 const geistSans = localFont({
     src: "./fonts/GeistVF.woff",
@@ -34,8 +35,15 @@ export default function RootLayout({
             <body
                 className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased font-[family-name:var(--font-inter)]`}
             >
-                {children}
-                <Toaster theme='light' toastFont='Inter' />
+                <ThemeProvider
+                    attribute='class'
+                    defaultTheme='system'
+                    enableSystem
+                    disableTransitionOnChange
+                >
+                    {children}
+                    <ThemedToaster />
+                </ThemeProvider>
             </body>
         </html>
     );
