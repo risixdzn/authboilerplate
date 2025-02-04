@@ -11,13 +11,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Settings } from "@/components/account/settings";
 import { Avatar } from "@/components/account/avatar";
 import { ModeToggle } from "@/components/mode-toggle";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 
 export default function ClientPage() {
     const { isPending, data } = useQuery<
         AxiosResponse<ApiResponse<z.infer<typeof nonSensitiveUser>>>
     >({
         queryKey: ["accountData"],
-        queryFn: async () => await axios.client.get("/account"),
+        queryFn: async () => await axios.get("/account"),
     });
 
     // if (error) return "An error has occurred: " + error.message;
@@ -28,8 +31,15 @@ export default function ClientPage() {
         <div className='w-full flex flex-col items-center py-6 px-5 md:p-10'>
             <div className='w-full max-w-6xl space-y-10'>
                 <div className='w-full flex items-center justify-between'>
-                    <h1 className='text-2xl font-semibold tracking-tight'>Account (client)</h1>
-                    <div className='flex gap-2'>
+                    <div className='flex gap-2 items-center'>
+                        <h1 className='text-2xl font-semibold tracking-tight'>Account (client)</h1>
+                        <Button asChild variant={"link"}>
+                            <Link href='/dashboard/server/account'>
+                                Server <ArrowRight />
+                            </Link>
+                        </Button>
+                    </div>
+                    <div className='flex gap-2 items-center'>
                         <ModeToggle />
                         <SignOutButton variant={"outline"}>Signout</SignOutButton>
                     </div>

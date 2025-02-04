@@ -49,7 +49,7 @@ export function DeleteAccount() {
     async function onSubmit(_: z.infer<typeof requestAccountDeletionSchema>) {
         setLoading(true);
         try {
-            const res = await axios.client.post<ApiResponse>(api("/account/request-deletion"), {
+            const res = await axios.post<ApiResponse>(api("/account/request-deletion"), {
                 withCredentials: true,
             });
             if (res.status === 201) {

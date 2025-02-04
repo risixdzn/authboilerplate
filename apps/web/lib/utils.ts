@@ -9,12 +9,15 @@ export function api(path: string) {
     return `${process.env.NEXT_PUBLIC_API_URL}${path}`;
 }
 
-export function parseJwt(token: string) {
-    try {
-        return JSON.parse(atob(token.split(".")[1]!));
-    } catch (e) {
-        return null;
+export function parseJwt(token?: string) {
+    if (token) {
+        try {
+            return JSON.parse(atob(token.split(".")[1]!));
+        } catch (_) {
+            return null;
+        }
     }
+    return null;
 }
 
 export const isClientSide = (): boolean => typeof window !== "undefined";

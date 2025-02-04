@@ -61,7 +61,7 @@ export function RegisterForm({ onSuccess }: { onSuccess: Dispatch<SetStateAction
     async function onSubmit(values: z.infer<typeof createUserSchema>) {
         setLoading(true);
         try {
-            const res = await axios.client.post<ApiResponse>(api("/auth/register"), values);
+            const res = await axios.post<ApiResponse>(api("/auth/register"), values);
             const message = messages[res.data.code] ?? fallbackMessages.success;
 
             if (res.status === 201) {

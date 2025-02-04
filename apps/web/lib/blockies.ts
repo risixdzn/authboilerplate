@@ -1,3 +1,9 @@
+/**
+ * Blockies: A tiny library for generating identicons.
+ * Original repository: https://github.com/download13/blockies
+ * Converted to TypeScript and to use SVGs instead of canvas
+ */
+
 type Options = {
     seed?: string;
     size?: number;
@@ -70,35 +76,39 @@ function buildOpts(opts: Options): Required<Options> {
     };
 }
 
-export function renderIcon(opts: Options, canvas: HTMLCanvasElement): HTMLCanvasElement {
+/**
+ * Generates an SVG-based identicon as a Data URL.
+ */
+export function createIconSVG(opts: Options): string {
     const builtOpts = buildOpts(opts);
     const imageData = createImageData(builtOpts.size);
     const width = Math.sqrt(imageData.length);
-    canvas.width = canvas.height = builtOpts.size * builtOpts.scale;
-    const cc = canvas.getContext("2d");
-    if (!cc) throw new Error("Canvas context not available");
+    const scale = builtOpts.scale;
 
-    cc.fillStyle = builtOpts.bgcolor;
-    cc.fillRect(0, 0, canvas.width, canvas.height);
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${
+        builtOpts.size * scale
+    } ${builtOpts.size * scale}" width="${builtOpts.size * scale}" height="${
+        builtOpts.size * scale
+    }">`;
 
+    // Background color
+    svg += `<rect width="100%" height="100%" fill="${builtOpts.bgcolor}" />`;
+
+    // Foreground pixels
     for (let i = 0; i < imageData.length; i++) {
         if (imageData[i]) {
             const row = Math.floor(i / width);
             const col = i % width;
-            cc.fillStyle = imageData[i] === 1 ? builtOpts.color : builtOpts.spotcolor;
-            cc.fillRect(
-                col * builtOpts.scale,
-                row * builtOpts.scale,
-                builtOpts.scale,
-                builtOpts.scale
-            );
+            const fill = imageData[i] === 1 ? builtOpts.color : builtOpts.spotcolor;
+
+            svg += `<rect x="${col * scale}" y="${
+                row * scale
+            }" width="${scale}" height="${scale}" fill="${fill}" />`;
         }
     }
 
-    return canvas;
-}
+    svg += `</svg>`;
 
-export function createIcon(opts: Options): HTMLCanvasElement {
-    const canvas = document.createElement("canvas");
-    return renderIcon(opts, canvas);
+    // Convert SVG string to a data URL
+    return `data:image/svg+xml;base64,${btoa(svg)}`;
 }
