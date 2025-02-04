@@ -175,4 +175,61 @@ Once clicked, the email is confirmed and the single use token is deleted, then t
     },
 };
 
-export const authDocs = { registerSchema, loginSchema, revalidateSchema, verifySchema };
+const signOutSchema: FastifySchema = {
+    tags: ["Auth"],
+    description: `**Signs-out the user server-side**
+        
+This route deletes the user \`refreshToken\` on the database, meaning that he is now "signed-out".
+
+The frontend should then redirect the user to the login page, while deleting the cookies that it has stored. 
+
+PS: Signout **do not** require authentication. This allow us to hit this route on middlewares to invalidate the \`refreshToken\` on the DB
+for users that are trying to request a new \`JWT\` when their \`refreshToken\` has expired.
+        `,
+    summary: "Signout",
+    response: {
+        400: zodResponseSchema({
+            status: 400,
+            error: "Bad Request",
+            code: "no_refresh_provided",
+            message: "No refresh token provided",
+            data: null,
+        }).describe("No refreshToken provided on the cookies."),
+        401: zodResponseSchema({
+            status: 401,
+            error: "Unauthorized",
+            code: "invalid_refresh",
+            message: "Invalid refresh token",
+            data: null,
+        }).describe("The provided refreshToken is invalid."),
+        410: zodResponseSchema({
+            status: 410,
+            error: "Gone",
+            code: "refresh_expired",
+            message: "Refresh token expired",
+            data: null,
+        }).describe("The refreshToken expired."),
+        404: zodResponseSchema({
+            status: 404,
+            error: "Not found",
+            code: "user_not_found",
+            message: "User not found",
+            data: null,
+        }).describe("The user related to the refreshtoken was not found."),
+        200: zodResponseSchema({
+            status: 200,
+            error: null,
+            code: "signout_success",
+            message: "User signed out successfully",
+            data: null,
+        }).describe("The user was successfully signed-out."),
+    },
+};
+
+export const authDocs = {
+    registerSchema,
+    loginSchema,
+    revalidateSchema,
+    verifySchema,
+    signOutSchema,
+};

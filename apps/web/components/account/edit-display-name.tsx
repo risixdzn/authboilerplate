@@ -33,7 +33,7 @@ export function EditDisplayName({ displayName }: { displayName: string }) {
     async function onSubmit(values: z.infer<typeof editAccountSchema>) {
         setLoading(true);
         try {
-            const res = await axios.client.patch<ApiResponse>(api("/account"), values, {
+            const res = await axios.patch<ApiResponse>(api("/account"), values, {
                 withCredentials: true,
             });
             if (res.status === 200) {

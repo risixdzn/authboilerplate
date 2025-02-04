@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from "axios";
 import { parseCookies } from "nookies";
-import { parseJwt } from "../../utils";
+import { isClientSide, parseJwt } from "../utils";
 
 const axiosClient = axios.create({
     withCredentials: true,
@@ -25,6 +25,26 @@ const processQueue = (error: AxiosError | null) => {
     failedQueue = [];
 };
 
+/**
+ * This appends the JWT+refreshToken cookies at every request SERVER SIDE
+ * We import next/headers inside the conditional so it doesnt crash on the client
+ */
+axiosClient.interceptors.request.use(async (config) => {
+    if (!isClientSide()) {
+        const { cookies } = await import("next/headers");
+        const cookiesString = cookies()
+            .getAll()
+            .map((item) => `${item.name}=${item.value}`)
+            .join("; ");
+        config.headers.set("Cookie", cookiesString);
+    }
+
+    return config;
+});
+
+/**
+ * This verifies jwt presence and expiration on request, client side, using nookies.
+ */
 axiosClient.interceptors.request.use(
     async (config) => {
         const cookies = parseCookies();
@@ -106,4 +126,4 @@ axios.interceptors.response.use(
     }
 );
 
-export { axiosClient };
+export { axiosClient as axios };

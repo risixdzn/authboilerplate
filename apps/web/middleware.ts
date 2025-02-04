@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { parseJwt } from "./lib/utils";
 
 export async function middleware(request: NextRequest) {
     const token = request.cookies.get("token")?.value;
@@ -47,8 +48,10 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    //Revalidate the user JWT if its not present (cookie expired)
-    if (!token) {
+    const payload = parseJwt(token);
+
+    //Revalidate the user JWT if its not present (cookie vanished) or expired
+    if (!token || (payload && payload.exp * 1000 < Date.now())) {
         try {
             const response = await revalidate(request, isProtectedRoute);
             return response;
@@ -80,21 +83,19 @@ async function revalidate(request: NextRequest, isProtectedRoute: boolean) {
         const setCookie = revalidateResponse.headers.get("Set-Cookie");
 
         if (setCookie) {
-            const res = NextResponse.next();
+            // Force a redirect to the same page to trigger a new request
+            const res = NextResponse.redirect(request.nextUrl);
             res.headers.set("Set-Cookie", setCookie);
             return res;
         }
     }
 
-    // If refreshToken is invalid (401), clear cookies to prevent infinite loop
+    // Handle invalid refresh token: redirect to signout route which will clear cookies and redirect to login
     if (revalidateResponse.status === 401) {
-        const res = NextResponse.redirect(new URL("/auth/login", request.url));
-        res.cookies.delete("refreshToken");
-        res.cookies.delete("token");
-        return res;
+        return NextResponse.redirect(new URL("/api/auth/signout", request.url));
     }
 
-    // Revalidation failed; redirect to login
+    // Revalidation failed: redirect to login
     if (isProtectedRoute) {
         return NextResponse.redirect(new URL("/auth/login", request.url));
     }
