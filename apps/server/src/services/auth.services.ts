@@ -4,6 +4,8 @@ import { db } from "../db/connection";
 import { refreshTokens, users } from "../db/schema";
 import { createUserSchema } from "@repo/schemas/auth";
 import { z } from "zod";
+import { userCacheKey } from "../helpers/cache";
+import { redis } from "../config/redis";
 
 export async function queryUserByEmail(email: string) {
     const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
@@ -45,9 +47,19 @@ export async function createUser(
 }
 
 export async function setUserVerified(userId: string) {
-    return await db.update(users).set({ verified: true }).where(eq(users.id, userId));
+    const verifyUser = db.update(users).set({ verified: true }).where(eq(users.id, userId));
+
+    const cacheKey = userCacheKey(userId);
+    await redis.del(cacheKey);
+
+    return await verifyUser;
 }
 
 export async function deleteUser(userId: string) {
-    return await db.delete(users).where(eq(users.id, userId));
+    const delUser = db.delete(users).where(eq(users.id, userId));
+
+    const cacheKey = userCacheKey(userId);
+    await redis.del(cacheKey);
+
+    return await delUser;
 }
