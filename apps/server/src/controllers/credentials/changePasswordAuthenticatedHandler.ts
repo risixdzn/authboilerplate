@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import { FastifyReply } from "fastify";
 import { z } from "zod";
 

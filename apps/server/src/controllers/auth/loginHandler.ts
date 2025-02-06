@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import { FastifyReply } from "fastify";
 import { z } from "zod";
 
@@ -6,7 +6,7 @@ import { apiResponse } from "@/src/helpers/response";
 
 import { signJWT } from "../../helpers/jwt";
 import { generateRefreshToken } from "../../helpers/tokens";
-import { loginUserSchema } from "@repo/schemas/auth";
+import { loginUserSchema, nonSensitiveUser } from "@repo/schemas/auth";
 import { queryUserByEmail } from "../../services/auth.services";
 import { setJWTCookie, setRefreshToken } from "../../services/tokens.services";
 
@@ -33,7 +33,7 @@ export async function loginHandler({
         );
     }
 
-    if (user.verified === false) {
+    if (!user.verified) {
         return response.status(403).send(
             apiResponse({
                 status: 403,
@@ -62,17 +62,12 @@ export async function loginHandler({
 
     //If the password is valid, sign the JWT and set the new refresh token
     const token = signJWT({
-        payload: {
-            id: user.id,
-            displayName: user.displayName,
-            email: user.email,
-            createdAt: user.createdAt,
-        },
+        payload: nonSensitiveUser.parse(user),
     });
 
     const refreshToken = generateRefreshToken();
     await setRefreshToken(response, refreshToken, user.id);
-    await setJWTCookie(response, token);
+    setJWTCookie(response, token);
 
     return response.status(200).send(
         apiResponse({

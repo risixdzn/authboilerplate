@@ -1,3 +1,4 @@
+import { nonSensitiveUser } from "@repo/schemas/auth";
 import { FastifyReply } from "fastify";
 import { z } from "zod";
 
@@ -34,12 +35,7 @@ export async function getAccountHandler({
             error: null,
             code: "get_account_success",
             message: "Account retrieved successfully.",
-            data: {
-                id: user.id,
-                displayName: user.displayName,
-                email: user.email,
-                createdAt: user.createdAt,
-            },
+            data: nonSensitiveUser.parse(user),
         })
     );
 }
@@ -73,7 +69,7 @@ export async function editAccountHandler({
             error: null,
             code: "update_account_success",
             message: "Account data updated successfully",
-            data: updatedUser,
+            data: nonSensitiveUser.parse(updatedUser),
         })
     );
 }

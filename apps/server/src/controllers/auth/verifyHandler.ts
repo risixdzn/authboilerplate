@@ -53,8 +53,9 @@ export async function verifyHandler({
     }
 
     //If all checks succeed, update the user to be verified and delete the token
-    await setUserVerified(oneTimeToken.user.id);
-    await deleteOneTimeToken(oneTimeToken.token);
+    const verifyUser = setUserVerified(oneTimeToken.user.id);
+    const deleteToken = deleteOneTimeToken(oneTimeToken.token);
+    await Promise.allSettled([verifyUser, deleteToken]);
 
     if (redirectUrl) {
         return response

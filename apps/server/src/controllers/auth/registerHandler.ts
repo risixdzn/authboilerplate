@@ -54,13 +54,11 @@ export async function registerHandler({
 
     const verificationUrl = `${request.protocol}://${request.host}/auth/verify?token=${encodeURIComponent(oneTimeToken.token)}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
 
-    const verificationEmail = await sendAccountVerificationEmail({
+    await sendAccountVerificationEmail({
         to: newUser.email,
         verificationUrl: verificationUrl,
         displayName: newUser.displayName ?? emailDisplayName(newUser.email),
-    });
-
-    if (!verificationEmail) {
+    }).catch(async () => {
         await deleteUser(newUser.id);
 
         return response.status(500).send(
@@ -72,7 +70,7 @@ export async function registerHandler({
                 data: null,
             })
         );
-    }
+    });
 
     return response.status(201).send(
         apiResponse({
