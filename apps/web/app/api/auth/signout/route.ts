@@ -5,10 +5,12 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
     const cookieStore = cookies();
 
-    await signOut(cookieStore.toString());
+    try {
+        await signOut(cookieStore.toString());
+    } finally {
+        cookieStore.delete("token");
+        cookieStore.delete("refreshToken");
 
-    cookieStore.delete("token");
-    cookieStore.delete("refreshToken");
-
-    return NextResponse.redirect(new URL("/auth/login", request.url));
+        return NextResponse.redirect(new URL("/auth/login", request.url));
+    }
 }
