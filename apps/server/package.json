@@ -6,12 +6,12 @@
     "type": "module",
     "private": true,
     "scripts": {
-        "test": "vitest",
-        "start": "tsx src/server.ts",
-        "dev": "tsx watch src/server.ts",
-        "build": "tsup src",
-        "migrate": "tsx src/db/migrate.ts",
-        "generate": "drizzle-kit generate"
+        "test": "dotenv -- vitest",
+        "start": "dotenv -- tsx src/server.ts",
+        "dev": "dotenv -- tsx watch src/server.ts",
+        "build": "dotenv -- tsup src",
+        "migrate": "dotenv -- tsx src/db/migrate.ts",
+        "generate": "dotenv -- drizzle-kit generate"
     },
     "keywords": [],
     "author": "",

@@ -140,6 +140,7 @@ server.register(credentialsRoutes, {
 });
 
 server.get("/", (_, reply) => {
+    console.log(env);
     reply.status(200).send("OK");
 });
 
