@@ -41,18 +41,6 @@ export async function requestAccountDeletionHandler({
 
     const user = await queryUserById(userId);
 
-    if (!user) {
-        return response.status(404).send(
-            apiResponse({
-                status: 404,
-                error: "Not Found",
-                code: "user_not_found",
-                message: "User not found",
-                data: null,
-            })
-        );
-    }
-
     const oneTimeToken = await createOneTimeToken({
         userId: userId,
         email: user.email,
