@@ -17,18 +17,6 @@ export async function getAccountHandler({
 }) {
     const user = await queryUserById(userId);
 
-    if (!user) {
-        return response.status(404).send(
-            apiResponse({
-                status: 404,
-                error: "Not Found",
-                code: "user_not_found",
-                message: "User not found",
-                data: null,
-            })
-        );
-    }
-
     return response.status(200).send(
         apiResponse({
             status: 200,
@@ -50,18 +38,6 @@ export async function editAccountHandler({
     response: FastifyReply;
 }) {
     const updatedUser = await updateUserById(body, user.id);
-
-    if (!updatedUser) {
-        return response.status(404).send(
-            apiResponse({
-                status: 404,
-                error: "Not Found",
-                code: "user_not_found",
-                message: "User not found",
-                data: null,
-            })
-        );
-    }
 
     return response.status(200).send(
         apiResponse({

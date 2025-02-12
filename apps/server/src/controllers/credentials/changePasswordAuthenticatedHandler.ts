@@ -20,18 +20,6 @@ export async function changePasswordAuthenticatedHandler({
 }) {
     const userData = await queryUserById(user.id);
 
-    if (!userData) {
-        return response.status(404).send(
-            apiResponse({
-                status: 404,
-                error: "Not Found",
-                code: "user_not_found",
-                message: "User not found",
-                data: null,
-            })
-        );
-    }
-
     const validPassword = await bcrypt.compare(body.old, userData.passwordHash);
 
     if (!validPassword) {
