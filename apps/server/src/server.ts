@@ -6,6 +6,8 @@ import {
     serializerCompiler,
     validatorCompiler,
     ZodTypeProvider,
+    hasZodFastifySchemaValidationErrors,
+    isResponseSerializationError,
 } from "fastify-type-provider-zod";
 import { ZodError } from "zod";
 
@@ -25,6 +27,8 @@ import { apiDescription } from "./docs/main";
 import { join } from "path";
 import { cwd } from "process";
 import { nonSensitiveUser } from "@repo/schemas/auth";
+import { apiResponse } from "./helpers/response";
+import { apiResponseSchema } from "@repo/schemas/utils";
 
 const envToLogger = {
     development: {
@@ -83,6 +87,7 @@ server.register(fastifySwagger, {
     transform: jsonSchemaTransform,
     transformObject: createJsonSchemaTransformObject({
         schemas: {
+            Response: apiResponseSchema,
             User: nonSensitiveUser,
         },
     }),
@@ -140,7 +145,6 @@ server.register(credentialsRoutes, {
 });
 
 server.get("/", (_, reply) => {
-    console.log(env);
     reply.status(200).send("OK");
 });
 
@@ -149,18 +153,52 @@ server.register(fastifyCors, {
     credentials: true,
 });
 
-//Map the zod errors to standart response
+//Map the zod errors to standard response
 server.setErrorHandler((error, request, reply) => {
     if (error instanceof ZodError) {
-        reply.status(400).send({
-            statusCode: 400,
-            error: "Bad Request",
-            issues: error.issues,
-        });
+        reply.status(400).send(
+            apiResponse({
+                status: 400,
+                error: "Bad Request",
+                code: "bad_request",
+                message: "Type validation failed",
+                data: error.issues,
+            })
+        );
         return;
     }
 
     reply.send(error);
+});
+
+server.setErrorHandler((error, request, response) => {
+    if (hasZodFastifySchemaValidationErrors(error)) {
+        return response.code(400).send(
+            apiResponse({
+                status: 400,
+                error: "Bad Request",
+                code: "request_validation_error",
+                message: "Request doesn't match the schema",
+                data: {
+                    issues: error.validation,
+                    method: request.method,
+                    url: request.url,
+                },
+            })
+        );
+    }
+
+    if (isResponseSerializationError(error)) {
+        return response.code(500).send(
+            apiResponse({
+                status: 500,
+                error: "Internal Server Error",
+                code: "response_serialization_failed",
+                message: "Response doesn't match the schema",
+                data: error,
+            })
+        );
+    }
 });
 
 //Run server.

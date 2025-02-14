@@ -24,4 +24,14 @@ Authentication and user management API featuring email/password auth with JWT to
 - Required email verification
 - HTTP-only \`refreshToken\` cookies
 - 30-minute expiry for \`oneTimeTokens\`
+
+## Responses
+
+All API responses follow a consistent format defined by the [Response](/docs/#model/response) model.
+Each response object contains:
+- **\`status\`**: HTTP status code (e.g., 200, 404, 500)
+- **\`error\`**: Error message if one occurred, otherwise \`null\`
+- **\`message\`**: A developer-friendly message for debugging or logging
+- **\`code\`**: A unique code for frontend feedback
+- **\`data\`**: The requested payload or error details
 `;
