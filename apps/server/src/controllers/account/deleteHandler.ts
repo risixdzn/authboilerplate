@@ -11,6 +11,7 @@ import {
 } from "../../services/tokens.services";
 import { apiResponse } from "@/src/helpers/response";
 import { env } from "@/src/env";
+import { cookieKey } from "@repo/constants/cookies";
 
 export async function requestAccountDeletionHandler({
     userId,
@@ -119,7 +120,7 @@ export async function confirmAccountDeletionHandler({
 
     if (redirectUrl) {
         return response
-            .setCookie("showDeletedDialog", "true", {
+            .setCookie(cookieKey("showDeletedDialog"), "true", {
                 path: "/",
                 httpOnly: false,
                 sameSite: "none",

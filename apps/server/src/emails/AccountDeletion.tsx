@@ -26,7 +26,7 @@ export const AccountDeletionEmail = ({ displayName, appName, verificationUrl }: 
         <Preview>{displayName}, confirm your account deletion.</Preview>
         <Body style={main}>
             <Container style={container}>
-                <Img src={`https://i.imgur.com/YBTp817.png`} width='31' height='25' alt='' />
+                <Img src={`/public/logo.png`} width='31' height='25' alt='' />
 
                 <Text style={title}>Account deletion confirmation</Text>
 

@@ -1,3 +1,4 @@
+import { cookieKey } from "./../../../packages/constants/src/cookies";
 import chalk from "chalk";
 import { fastify } from "fastify";
 import {
@@ -29,6 +30,7 @@ import { cwd } from "process";
 import { nonSensitiveUser } from "@repo/schemas/auth";
 import { apiResponse } from "./helpers/response";
 import { apiResponseSchema } from "@repo/schemas/utils";
+import { APP_NAME } from "@repo/constants/app";
 
 const envToLogger = {
     development: {
@@ -54,9 +56,9 @@ server.setSerializerCompiler(serializerCompiler);
 server.register(fastifySwagger, {
     openapi: {
         info: {
-            title: "Auth Boilerplate API",
+            title: `${APP_NAME} API`,
             version: "1.0.0",
-            summary: "Auth Boilerplate API",
+            summary: `${APP_NAME} API`,
             description: apiDescription,
         },
         tags: [
@@ -102,7 +104,7 @@ server.register(scalarUi, {
             url: "/reference/json",
         },
         metaData: {
-            title: "Docs - Auth Boilerplate API",
+            title: `Docs - ${APP_NAME} API`,
         },
         favicon: "/public/favicon.svg",
         theme: "none",
@@ -118,7 +120,7 @@ server.register(fastifySwaggerUi, {
 server.register(fastifyJwt, {
     secret: env.JWT_SECRET,
     cookie: {
-        cookieName: "token",
+        cookieName: cookieKey("session"),
         signed: false,
     },
 });

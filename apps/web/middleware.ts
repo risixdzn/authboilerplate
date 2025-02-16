@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseJwt } from "./lib/utils";
+import { cookieKey } from "@repo/constants/cookies";
 
 export async function middleware(request: NextRequest) {
-    const token = request.cookies.get("token")?.value;
-    const refreshToken = request.cookies.get("refreshToken")?.value;
-    const hasDeletedAccount = request.cookies.get("showDeletedDialog")?.value;
+    const token = request.cookies.get(cookieKey("session"))?.value;
+    const refreshToken = request.cookies.get(cookieKey("refreshToken"))?.value;
+    const hasDeletedAccount = request.cookies.get(cookieKey("showDeletedDialog"))?.value;
 
     const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard");
     const isLoginPath = request.nextUrl.pathname.startsWith("/auth/login");
@@ -35,8 +36,8 @@ export async function middleware(request: NextRequest) {
          * So we check for the cookie that shows the dialog and ignore the redirection to the dashboard, also deleting the possible exis.
          */
         if (hasDeletedAccount) {
-            request.cookies.delete("refreshToken");
-            request.cookies.delete("token");
+            request.cookies.delete(cookieKey("refreshToken") as string);
+            request.cookies.delete(cookieKey("session") as string);
             return NextResponse.next();
         }
 

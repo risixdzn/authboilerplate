@@ -8,7 +8,6 @@ const envSchema = z.object({
     COOKIE_ENCRYPTION_SECRET: z.string(),
     RESEND_KEY: z.string(),
     EMAIL_DOMAIN: z.string(),
-    APP_NAME: z.string(),
     NODE_PORT: z.string(),
     FRONTEND_URL: z.string().url(),
     REDIS_PASSWORD: z.string(),

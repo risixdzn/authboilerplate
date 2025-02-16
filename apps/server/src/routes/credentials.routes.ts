@@ -7,7 +7,7 @@ import {
 } from "@repo/schemas/credentials";
 import { FastifyTypedInstance } from "../interfaces/fastify";
 import { authenticate } from "../middlewares/authenticate";
-import { userJWT } from "@/fastifyjwt";
+import { userJWT } from "@repo/schemas/auth";
 import { z } from "zod";
 import {
     confirmPasswordResetHandler,

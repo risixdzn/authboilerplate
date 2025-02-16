@@ -28,7 +28,7 @@ export const PasswordReset = ({ displayName, appName, verificationUrl }: EmailPr
         <Preview>Change your password, {displayName}!</Preview>
         <Body style={main}>
             <Container style={container}>
-                <Img src={`https://i.imgur.com/YBTp817.png`} width='31' height='25' alt='' />
+                <Img src={`/public/logo.png`} width='31' height='25' alt='' />
 
                 <Text style={title}>
                     Oops! Forgot your password, <strong>{displayName}</strong>?

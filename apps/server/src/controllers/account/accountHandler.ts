@@ -5,7 +5,7 @@ import { z } from "zod";
 import { editAccountSchema } from "@repo/schemas/account";
 import { queryUserById, updateUserById } from "../../services/account.services";
 
-import { userJWT } from "@/fastifyjwt";
+import { userJWT } from "@repo/schemas/auth";
 import { apiResponse } from "@/src/helpers/response";
 
 export async function getAccountHandler({

@@ -35,11 +35,16 @@ export const nonSensitiveUser = z
         id: z.string().cuid2(),
         email: z.string().email({ message: "Invalid email address" }),
         displayName: z.string().min(3).max(100).nullable(),
-        createdAt: z.date(),
+        createdAt: z.coerce.date(),
     })
     .describe(
         "Representing the user object, contains only non-sentitive data. User password will **NEVER** be returned in responses, not even in hashed format."
     );
+
+export const userJWT = nonSensitiveUser.extend({
+    iat: z.number(),
+    exp: z.number(),
+});
 
 export const verifyEmailSchema = z.object({
     token: z.string(),

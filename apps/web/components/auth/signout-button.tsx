@@ -1,19 +1,22 @@
 "use client";
 
-import React, { FormEvent } from "react";
+import React, { FormEvent, useState } from "react";
 import { Button, ButtonProps } from "../ui/button";
-import { LogOut } from "lucide-react";
+import { Loader2, LogOut } from "lucide-react";
 import { toast } from "@pheralb/toast";
 import { useRouter } from "next/navigation";
 
 const SignOutButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ({ children, ...props }, ref) => {
+        const [loading, setLoading] = useState(false);
+
         const router = useRouter();
 
         const onSubmit = (e: FormEvent<HTMLFormElement>) => {
             e.preventDefault();
 
             const fetchSignout = async () => {
+                setLoading(true);
                 const response = await fetch("/api/auth/signout", {
                     method: "GET",
                     credentials: "include",
@@ -37,9 +40,9 @@ const SignOutButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
         return (
             <form onSubmit={(e) => onSubmit(e)}>
-                <Button ref={ref} {...props}>
+                <Button disabled={loading} ref={ref} {...props}>
                     {children}
-                    <LogOut />
+                    {!loading ? <LogOut /> : <Loader2 className='animate-spin' />}
                 </Button>
             </form>
         );

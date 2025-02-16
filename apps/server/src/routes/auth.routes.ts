@@ -8,6 +8,7 @@ import { authDocs } from "../docs/auth.docs";
 import { createUserSchema, loginUserSchema, verifyEmailSchema } from "@repo/schemas/auth";
 import { FastifyTypedInstance } from "../interfaces/fastify";
 import { signOutHandler } from "../controllers/auth/signOutHandler";
+import { cookieKey } from "@repo/constants/cookies";
 
 export async function authRoutes(fastify: FastifyTypedInstance) {
     fastify.post(
@@ -43,13 +44,13 @@ export async function authRoutes(fastify: FastifyTypedInstance) {
     );
 
     fastify.get("/signout", { schema: authDocs.signOutSchema }, async (request, response) => {
-        const refreshToken = request.cookies["refreshToken"];
+        const refreshToken = request.cookies[cookieKey("refreshToken")];
 
         await signOutHandler({ refreshToken, response });
     });
 
     fastify.post("/token", { schema: authDocs.revalidateSchema }, async (request, response) => {
-        const refreshToken = request.cookies["refreshToken"];
+        const refreshToken = request.cookies[cookieKey("refreshToken")];
 
         await revalidateHandler({ refreshToken, response });
     });

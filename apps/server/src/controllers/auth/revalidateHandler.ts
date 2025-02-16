@@ -89,7 +89,7 @@ export async function revalidateHandler({
 
     const newRefreshToken = generateRefreshToken();
     await setRefreshToken(response, newRefreshToken, user.id);
-    await setJWTCookie(response, jwt);
+    setJWTCookie(response, jwt);
 
     return response.status(200).send(
         apiResponse({

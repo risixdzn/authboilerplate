@@ -40,8 +40,10 @@ For this, we generate a \`oneTimeToken\`, save it on the database, and send it t
 
 const loginSchema: FastifySchema = {
     tags: ["Auth"],
-    description:
-        "Login into the system. Returns a `JWT` and sets a `refreshToken` cookie on the client.",
+    description: `
+Login into the system. Returns a \`JWT\` and sets a \`refreshToken\` cookie on the client.
+        
+See [cookie naming conventions](/docs/#description/cookies) for more info.`,
     summary: "Login",
     body: loginUserSchema,
     response: {
@@ -86,7 +88,9 @@ Needs a \`refreshToken\` cookie, received from \`/auth/login\`, to succeed.
 
 This should be used when the short lived \`JWT\` expires.
 
-Will invalidate the passed \`refreshToken\` if all checks succeed and return a new one.        
+Will invalidate the passed \`refreshToken\` if all checks succeed and return a new one.     
+
+See [cookie naming conventions](/docs/#description/cookies) for more info.
         `,
     summary: "Revalidate JWT",
     response: {
@@ -182,6 +186,8 @@ const signOutSchema: FastifySchema = {
 This route deletes the user \`refreshToken\` on the database, meaning that he is now "signed-out".
 
 The frontend should then redirect the user to the login page, while deleting the cookies that it has stored. 
+
+See [cookie naming conventions](/docs/#description/cookies) for more info.
 
 PS: Signout **do not** require authentication. This allow us to hit this route on middlewares to invalidate the \`refreshToken\` on the DB
 for users that are trying to request a new \`JWT\` when their \`refreshToken\` has expired.

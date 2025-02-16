@@ -37,7 +37,7 @@ Users authenticate via JWT refresh tokens. Supported actions include:
 
 ![Authentication Flow](apps/server/src/public/flux.svg)
 
-## Development Setup
+## Setup
 
 Begin by configuring your environment. Rename and update the provided `.env.example` files:
 
@@ -63,3 +63,16 @@ Finally, start the development server:
 ```sh
 npm run dev
 ```
+
+## Customization
+
+Every aspect of this boilerplate can be customized to fit your needs. For example, you can:
+
+- Customize the `APP_NAME` in [packages/constants/src/app.ts](packages/constants/src/app.ts) which will be used in mailing, docs and some UI components.
+- Change the "Logo" to anything you like
+    - Web logo in: [apps/web/public/logo.svg](apps/web/public/logo.svg)
+    - Server logos in: [apps/server/src/public/logo.png](apps/server/src/public/logo.png) and [apps/server/src/public/favicon.svg](apps/server/src/public/favicon.svg)
+        > Logos won't load on emails on development server because email clients can't access your localhost. On the production server, they will work fine.
+- Customize every aspect of the UI Components in the [apps/web/components](apps/web/components) directory ([https://ui.shadcn.com/](shadcn/ui) btw).
+- Customize the mailing templates in the [apps/server/src/emails](apps/server/src/emails) directory using [https://react.email/](React Email).
+- Change docs theme and colors in the [apps/server/src/server.ts](apps/server/src/server.ts) file according to [https://github.com/scalar/scalar/blob/82c8f39c5f390ced5d8406bfb0b23623575fb85e/documentation/themes.md](Scalar UI themes).

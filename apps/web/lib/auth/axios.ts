@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from "axios";
 import { parseCookies } from "nookies";
 import { isClientSide, parseJwt } from "../utils";
+import { cookieKey } from "@repo/constants/cookies";
 
 const axiosClient = axios.create({
     withCredentials: true,
@@ -48,7 +49,7 @@ axiosClient.interceptors.request.use(async (config) => {
 axiosClient.interceptors.request.use(
     async (config) => {
         const cookies = parseCookies();
-        const jwt = cookies["token"];
+        const jwt = cookies[cookieKey("session")];
         const payload = parseJwt(jwt as string);
 
         if (!jwt || (payload && payload.exp * 1000 < Date.now())) {
