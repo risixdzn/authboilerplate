@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import { FastifyReply } from "fastify";
 import { z } from "zod";
 
-import { userJWT } from "@/fastifyjwt";
+import { userJWT } from "@repo/schemas/auth";
 import { hashPassword } from "../../helpers/hash-password";
 import { changePasswordAuthenticatedSchema } from "@repo/schemas/credentials";
 import { queryUserById } from "../../services/account.services";

@@ -10,7 +10,7 @@ import { FastifyTypedInstance } from "../interfaces/fastify";
 import { authenticate } from "../middlewares/authenticate";
 import { accountDocs } from "../docs/account.docs";
 import { z } from "zod";
-import { userJWT } from "@/fastifyjwt";
+import { userJWT } from "@repo/schemas/auth";
 
 export async function accountRoutes(fastify: FastifyTypedInstance) {
     fastify.get(

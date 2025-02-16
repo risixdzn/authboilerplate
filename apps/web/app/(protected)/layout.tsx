@@ -1,3 +1,4 @@
+import { Navbar } from "@/components/dashboard/navbar";
 import QueryClientWrapper from "@/lib/QueryClient";
 import type { Metadata } from "next";
 
@@ -13,7 +14,10 @@ export default function DashboardLayout({
 }>) {
     return (
         <QueryClientWrapper>
-            <main className='w-full min-h-dvh'>{children}</main>
+            <Navbar />
+            <main className='mt-4 max-w-6xl pb-20 sm:mx-auto lg:mt-10 lg:pb-10 max-sm:px-4 px-8'>
+                {children}
+            </main>
         </QueryClientWrapper>
     );
 }

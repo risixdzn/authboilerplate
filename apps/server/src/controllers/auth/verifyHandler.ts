@@ -5,6 +5,7 @@ import { apiResponse } from "@/src/helpers/response";
 import { setUserVerified } from "../../services/auth.services";
 import { deleteOneTimeToken, queryOneTimeToken } from "../../services/tokens.services";
 import { env } from "@/src/env";
+import { cookieKey } from "@repo/constants/cookies";
 
 export async function verifyHandler({
     token,
@@ -59,7 +60,7 @@ export async function verifyHandler({
 
     if (redirectUrl) {
         return response
-            .setCookie("showVerifiedDialog", "true", {
+            .setCookie(cookieKey("showVerifiedDialog"), "true", {
                 path: "/",
                 httpOnly: false,
                 sameSite: "none",

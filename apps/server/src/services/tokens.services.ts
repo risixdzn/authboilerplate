@@ -4,6 +4,7 @@ import { FastifyReply } from "fastify";
 import { db } from "../db/connection";
 import { oneTimeTokens, refreshTokens, users } from "../db/schema";
 import { generateOneTimeToken } from "../helpers/tokens";
+import { cookieKey } from "@repo/constants/cookies";
 
 export interface RefreshToken {
     token: string;
@@ -35,7 +36,7 @@ export async function setRefreshToken(response: FastifyReply, token: RefreshToke
     // Executing both operations in parallel cuz they don't depend on each other.
     await Promise.allSettled([createRefresh, deleteExpired]);
 
-    response.setCookie("refreshToken", token.token, cookieOptions);
+    response.setCookie(cookieKey("refreshToken"), token.token, cookieOptions);
 }
 
 export async function deleteRefreshToken(token: string) {
@@ -52,7 +53,7 @@ export function setJWTCookie(response: FastifyReply, token: string) {
         secure: true,
     };
 
-    response.setCookie("token", token, cookieOptions);
+    response.setCookie(cookieKey("session"), token, cookieOptions);
 }
 
 export async function createOneTimeToken({

@@ -28,7 +28,7 @@ export const VerificationEmail = ({ displayName, appName, verificationUrl }: Ema
         <Preview>{displayName}, Confirm your email!</Preview>
         <Body style={main}>
             <Container style={container}>
-                <Img src={`https://i.imgur.com/YBTp817.png`} width='31' height='25' alt='' />
+                <Img src={`/public/logo.png`} width='31' height='25' alt='' />
 
                 <Text style={title}>
                     <strong>{displayName}</strong>, your new account is just one step away.
